@@ -57,7 +57,7 @@
  *                      if ($ppu->update()) {
  *                          // If the update succeeded, the application should
  *                          // be restarted.
- *                          $ppu->forceExit();
+ *                          $ppu->forceRestart();
  *                      }
  *                  }
  *              }
@@ -822,10 +822,6 @@ class PEAR_PackageUpdate {
     {
         $this->pushError('presentUpdate is an abstract method that must be' .
                          ' overridden in the child class.');
-
-        // This var_dump is here for demo purposes during the PEPr proposal
-        // process. It should be removed before the first release.
-        var_dump($this->info);
 
         // Return false just in case something odd has happened.
         return false;
