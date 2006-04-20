@@ -104,6 +104,7 @@ define('PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED',   -8);
 define('PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE',          -9);
 define('PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE',         -10);
 define('PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF',          -11);
+define('PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER',    -12);
 
 // Error messages.
 $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
@@ -117,7 +118,8 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
           PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED   => 'Preferences file is corrupted.',
           PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE          => 'Invalid release type: %type%', 
           PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE         => 'Invalid release state: %state%', 
-          PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF          => 'Invalid preference: %preference%' 
+          PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF          => 'Invalid preference: %preference%',
+          PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER    => 'Driver %drivername% could not be found.'
           );                                             
 
 class PEAR_PackageUpdate {
@@ -226,18 +228,58 @@ class PEAR_PackageUpdate {
     {
         // Try to include the driver.
         $file = 'PEAR/PackageUpdate/' . $driver . '.php';
+
+        if (!PEAR_PackageUpdate::isIncludable($file)) {
+            require_once 'PEAR/ErrorStack.php';
+            PEAR_ErrorStack::staticPush('PEAR_PackageUpdate', 
+                                        PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER,
+                                        null,
+                                        array('drivername' => $driver), 
+                                        $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'][PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER]
+                                        );
+            // Must assign a variable to avoid notice about references.
+            $false = false;
+
+            return $false;
+        }
         include_once $file;
 
         // See if the class exists now.
         $class = 'PEAR_PackageUpdate_' . $driver;
         if (!class_exists($class)) {
-            return false;
+            // Must assign a variable to avoid notice about references.
+            $false = false;
+
+            return $false;
         }
 
         // Try to instantiate the class.
         $instance =& new $class($packageName, $channel);
 
         return $instance;
+    }
+
+    /**
+     * Returns whether or not a path is in the include path.
+     *
+     * @static
+     * @access public
+     * @param  string  $path
+     * @return boolean true if the path is in the include path.
+     */
+    function isIncludable($path)
+    {
+        // Break up the include path and check to see if the path is readable.
+        foreach (explode(PATH_SEPARATOR, get_include_path()) as $ip) {
+            if (file_exists($ip . DIRECTORY_SEPARATOR . $path) &&
+                is_readable($ip . DIRECTORY_SEPARATOR . $path)
+                ) {
+                return true;
+            }
+        }
+        
+        // If we got down here, the path is not readable from the include path.
+        return false;
     }
 
     /**
@@ -254,7 +296,7 @@ class PEAR_PackageUpdate {
     function loadPreferences()
     {
         // Get the preferences file.
-        $prefFile = PEAR_PackageUpdate::determinePrefFile();
+        $prefFile = $this->determinePrefFile();
         
         // Make sure the prefFile exists.
         if (!@file_exists($prefFile)) {
@@ -299,7 +341,6 @@ class PEAR_PackageUpdate {
     {
         // Determine the preferences file.
         // Borrowed from PEAR_Config
-        require_once 'PEAR.php';
         require_once 'PEAR/Config.php';
 
         $ds = DIRECTORY_SEPARATOR;
@@ -446,7 +487,7 @@ class PEAR_PackageUpdate {
     function savePreferences()
     {
         // Get the file to save the preferences to.
-        $prefFile = PEAR_PackageUpdate::determinePrefFile();
+        $prefFile = $this->determinePrefFile();
 
         // Open the file for writing.
         $fp = fopen($prefFile, 'w');
