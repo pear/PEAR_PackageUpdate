@@ -21,6 +21,9 @@
  * @since      File available since Release 0.4.0a1
  */
 
+require_once 'PEAR/ErrorStack.php';
+require_once 'PEAR/Config.php';
+
 // Constants for preferences.
 define('PEAR_PACKAGEUPDATE_PREF_NOUPDATES',   0);
 define('PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE', 1);
@@ -236,7 +239,6 @@ class PEAR_PackageUpdate
     function __construct($packageName, $channel)
     {
         // Create a pear error stack.
-        require_once 'PEAR/ErrorStack.php';
         $this->errors =& PEAR_ErrorStack::singleton(get_class($this));
 
         // Set the package name and channel.
@@ -263,7 +265,6 @@ class PEAR_PackageUpdate
         $file = 'PEAR/PackageUpdate/' . $driver . '.php';
 
         if (!PEAR_PackageUpdate::isIncludable($file)) {
-            require_once 'PEAR/ErrorStack.php';
             PEAR_ErrorStack::staticPush('PEAR_PackageUpdate',
                                         PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER,
                                         null,
@@ -377,7 +378,6 @@ class PEAR_PackageUpdate
     {
         // Determine the preferences file.
         // Borrowed from PEAR_Config
-        require_once 'PEAR/Config.php';
 
         $ds = DIRECTORY_SEPARATOR;
         if (OS_WINDOWS) {
@@ -448,7 +448,6 @@ class PEAR_PackageUpdate
         }
 
         // Create a config object.
-        require_once 'PEAR/Config.php';
         $config = new PEAR_Config();
 
         // Get the config's registry object.
@@ -848,8 +847,7 @@ class PEAR_PackageUpdate
      */
     function update()
     {
-      // Create a config object.
-        require_once 'PEAR/Config.php';
+        // Create a config object.
         $config  = new PEAR_Config();
 
         // Change the verbosity but keep track of the value to reset it just in
