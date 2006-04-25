@@ -240,6 +240,7 @@ class PEAR_PackageUpdate
     {
         // Create a pear error stack.
         $this->errors =& PEAR_ErrorStack::singleton(get_class($this));
+        $this->errors->setContextCallback(array(&$this, '_getBacktrace'));
 
         // Set the package name and channel.
         $this->packageName = $packageName;
@@ -247,6 +248,25 @@ class PEAR_PackageUpdate
 
         // Load the user's preferences.
         $this->loadPreferences();
+    }
+
+    /**
+     * Callback that generates context information (location of error)
+     * for the package error stack.
+     *
+     * @access private
+     * @return mixed  backtrace context array or false is unavailable
+     * @since  0.4.3
+     */
+    function _getBacktrace()
+    {
+        if (function_exists('debug_backtrace')) {
+            $backtrace = debug_backtrace();
+            $backtrace = $backtrace[count($backtrace)-1];
+        } else {
+            $backtrace = false;
+        }
+        return $backtrace;
     }
 
     /**
