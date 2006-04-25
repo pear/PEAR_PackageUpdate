@@ -3,78 +3,24 @@
  * A package to make adding self updating functionality to other
  * packages easy.
  *
- * The package allows a developer to add a few lines of code to 
- * their existing packages and have the ability to update their
- * package automatically. This auto-update ability allows users
- * to stay up to date much more easily than requiring them to
- * update manually. 
- * 
- * This package keeps track of user preferences such as "don't 
- * remind me again".
+ * PHP versions 4 and 5
  *
- * This package is designed to be a backend to different front
- * ends written for this package. For example, this package can
- * be used to drive a PHP-GTK 2, CLI or web front end. The API
- * for this package should be flexible enough to allow any type
- * of front end to be used and also to allow the package to be
- * used directly in another package without a front end driver.
+ * LICENSE: This source file is subject to version 3.01 of the PHP license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.php.net/license/3_01.txt.  If you did not receive a copy of
+ * the PHP License and are unable to obtain it through the web, please
+ * send a note to license@php.net so we can mail you a copy immediately.
  *
- * The interface for this package must allow for the following
- * functionality:
- * - check to see if a new version is available for a given 
- *   package on a given channel
- *   - check minimum state
- * - present information regarding the upgrade (version, size)
- *   - inform user about dependencies
- * - allow user to confirm or cancel upgrade
- * - download and install the package
- * - track preferences on a per package basis
- *   - don't ask again
- *   - don't ask until next release
- *   - only ask for state XXXX or higher
- *   - bug/minor/major updates only
- * - update channel automatically
- * - force application to exit when upgrade complete
- *   - PHP-GTK/CLI apps must exit to allow classes to reload
- *   - web front end could send headers to reload certain page
- *
- * This class is simply a wrapper for PEAR classes that actually
- * do the work. 
- *
- * EXAMPLE:
- * <code>
- * <?php
- *  class Goo {
- *      function __construct()
- *      {
- *          // Check for updates...
- *          require_once 'PEAR/PackageUpdate.php';
- *          $ppu =& PEAR_PackageUpdate::factory('Gtk2', 'Goo', 'pear');
- *          if ($ppu !== false) {
- *              if ($ppu->checkUpdate()) {
- *                  // Use a dialog window to ask permission to update.
- *                  if ($ppu->presentUpdate()) {
- *                      if ($ppu->update()) {
- *                          // If the update succeeded, the application should
- *                          // be restarted.
- *                          $ppu->forceRestart();
- *                      }
- *                  }
- *              }
- *          }
- *          // ...
- *      }
- *      // ...
- *  }
- * ?>
- * </code>
- *
- * @author    Scott Mattocks
- * @package   PEAR_PackageUpdate
- * @version   @version@
- * @license   PHP License 3
- * @copyright Copyright 2006 Scott Mattocks
+ * @category   PEAR
+ * @package    PEAR_PackageUpdate
+ * @author     Scott Mattocks
+ * @copyright  2006 Scott Mattocks
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    CVS: $Id$
+ * @link       http://pear.php.net/package/PEAR_PackageUpdate
+ * @since      File available since Release 0.4.0a1
  */
+
 // Constants for preferences.
 define('PEAR_PACKAGEUPDATE_PREF_NOUPDATES',   0);
 define('PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE', 1);
@@ -116,19 +62,97 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
           PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEACCESS => 'Preferences cannot be written to %file% because of access permission errors.',
           PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR  => 'An error occurred while trying to write the preferences to %file%.',
           PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED   => 'Preferences file is corrupted.',
-          PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE          => 'Invalid release type: %type%', 
-          PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE         => 'Invalid release state: %state%', 
+          PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE          => 'Invalid release type: %type%',
+          PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE         => 'Invalid release state: %state%',
           PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF          => 'Invalid preference: %preference%',
           PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER    => 'Driver %drivername% could not be found.'
-          );                                             
+          );
 
-class PEAR_PackageUpdate {
+/**
+ * The package allows a developer to add a few lines of code to
+ * their existing packages and have the ability to update their
+ * package automatically. This auto-update ability allows users
+ * to stay up to date much more easily than requiring them to
+ * update manually.
+ *
+ * This package keeps track of user preferences such as "don't
+ * remind me again".
+ *
+ * This package is designed to be a backend to different front
+ * ends written for this package. For example, this package can
+ * be used to drive a PHP-GTK 2, CLI or web front end. The API
+ * for this package should be flexible enough to allow any type
+ * of front end to be used and also to allow the package to be
+ * used directly in another package without a front end driver.
+ *
+ * The interface for this package must allow for the following
+ * functionality:
+ * - check to see if a new version is available for a given
+ *   package on a given channel
+ *   - check minimum state
+ * - present information regarding the upgrade (version, size)
+ *   - inform user about dependencies
+ * - allow user to confirm or cancel upgrade
+ * - download and install the package
+ * - track preferences on a per package basis
+ *   - don't ask again
+ *   - don't ask until next release
+ *   - only ask for state XXXX or higher
+ *   - bug/minor/major updates only
+ * - update channel automatically
+ * - force application to exit when upgrade complete
+ *   - PHP-GTK/CLI apps must exit to allow classes to reload
+ *   - web front end could send headers to reload certain page
+ *
+ * This class is simply a wrapper for PEAR classes that actually
+ * do the work.
+ *
+ * EXAMPLE:
+ * <code>
+ * <?php
+ *  class Goo {
+ *      function __construct()
+ *      {
+ *          // Check for updates...
+ *          require_once 'PEAR/PackageUpdate.php';
+ *          $ppu =& PEAR_PackageUpdate::factory('Gtk2', 'Goo', 'pear');
+ *          if ($ppu !== false) {
+ *              if ($ppu->checkUpdate()) {
+ *                  // Use a dialog window to ask permission to update.
+ *                  if ($ppu->presentUpdate()) {
+ *                      if ($ppu->update()) {
+ *                          // If the update succeeded, the application should
+ *                          // be restarted.
+ *                          $ppu->forceRestart();
+ *                      }
+ *                  }
+ *              }
+ *          }
+ *          // ...
+ *      }
+ *      // ...
+ *  }
+ * ?>
+ * </code>
+ *
+ * @category   PEAR
+ * @package    PEAR_PackageUpdate
+ * @author     Scott Mattocks
+ * @copyright  2006 Scott Mattocks
+ * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version    Release: @version@
+ * @link       http://pear.php.net/package/PEAR_PackageUpdate
+ * @since      Class available since Release 0.4.0a1
+ */
 
+class PEAR_PackageUpdate
+{
     /**
      * The user's update preferences.
      *
      * @access public
      * @var    array
+     * @since  0.4.0a1
      */
     var $preferences = array();
 
@@ -137,6 +161,7 @@ class PEAR_PackageUpdate {
      *
      * @access public
      * @var    string
+     * @since  0.4.0a1
      */
     var $packageName;
 
@@ -145,6 +170,7 @@ class PEAR_PackageUpdate {
      *
      * @access public
      * @var    string
+     * @since  0.4.0a1
      */
     var $channel;
 
@@ -153,6 +179,7 @@ class PEAR_PackageUpdate {
      *
      * @access public
      * @var    string
+     * @since  0.4.0a1
      */
     var $latestVersion;
 
@@ -161,6 +188,7 @@ class PEAR_PackageUpdate {
      *
      * @access public
      * @var    array
+     * @since  0.4.0a1
      */
     var $info = array();
 
@@ -169,6 +197,7 @@ class PEAR_PackageUpdate {
      *
      * @access public
      * @var    string
+     * @since  0.4.0a1
      */
     var $instVersion;
 
@@ -177,6 +206,7 @@ class PEAR_PackageUpdate {
      *
      * @access public
      * @var    object
+     * @since  0.4.0a1
      */
     var $errors;
 
@@ -187,6 +217,7 @@ class PEAR_PackageUpdate {
      * @param  string $packageName The package to update.
      * @param  string $channel     The channel the package resides on.
      * @return void
+     * @since  0.4.0a1
      */
     function PEAR_PackageUpdate($packageName, $channel)
     {
@@ -200,6 +231,7 @@ class PEAR_PackageUpdate {
      * @param  string $packageName The package to update.
      * @param  string $channel     The channel the package resides on.
      * @return void
+     * @since  0.4.0a1
      */
     function __construct($packageName, $channel)
     {
@@ -223,6 +255,7 @@ class PEAR_PackageUpdate {
      * @param  string $packageName The package to update.
      * @param  string $channel     The channel the package resides on.
      * @return object An instance of type PEAR_PackageUpdate_$driver
+     * @since  0.4.0a1
      */
     function &factory($driver, $packageName, $channel)
     {
@@ -231,10 +264,10 @@ class PEAR_PackageUpdate {
 
         if (!PEAR_PackageUpdate::isIncludable($file)) {
             require_once 'PEAR/ErrorStack.php';
-            PEAR_ErrorStack::staticPush('PEAR_PackageUpdate', 
+            PEAR_ErrorStack::staticPush('PEAR_PackageUpdate',
                                         PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER,
                                         null,
-                                        array('drivername' => $driver), 
+                                        array('drivername' => $driver),
                                         $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'][PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER]
                                         );
             // Must assign a variable to avoid notice about references.
@@ -266,6 +299,7 @@ class PEAR_PackageUpdate {
      * @access public
      * @param  string  $path
      * @return boolean true if the path is in the include path.
+     * @since  0.4.2
      */
     function isIncludable($path)
     {
@@ -277,7 +311,7 @@ class PEAR_PackageUpdate {
                 return true;
             }
         }
-        
+
         // If we got down here, the path is not readable from the include path.
         return false;
     }
@@ -292,12 +326,13 @@ class PEAR_PackageUpdate {
      *
      * @access protected
      * @return boolean   true on success, false on error
+     * @since  0.4.0a1
      */
     function loadPreferences()
     {
         // Get the preferences file.
         $prefFile = $this->determinePrefFile();
-        
+
         // Make sure the prefFile exists.
         if (!@file_exists($prefFile)) {
             // Try to create it by saving the current preferences (probably
@@ -336,6 +371,7 @@ class PEAR_PackageUpdate {
      *
      * @access protected
      * @return string
+     * @since  0.4.0a1
      */
     function determinePrefFile()
     {
@@ -362,6 +398,7 @@ class PEAR_PackageUpdate {
      *
      * @access public
      * @return boolean true if an update is available.
+     * @since  0.4.0a1
      */
     function checkUpdate()
     {
@@ -390,6 +427,7 @@ class PEAR_PackageUpdate {
      *
      * @access protected
      * @return boolean   true on success, false on error
+     * @since  0.4.0a1
      */
     function getPackageInfo()
     {
@@ -468,6 +506,7 @@ class PEAR_PackageUpdate {
      *
      * @access public
      * @return array
+     * @since  0.4.0a1
      */
     function getPackagePreferences()
     {
@@ -483,6 +522,7 @@ class PEAR_PackageUpdate {
      *
      * @access public
      * @return boolean true on success, false on error
+     * @since  0.4.0a1
      */
     function savePreferences()
     {
@@ -508,7 +548,7 @@ class PEAR_PackageUpdate {
                              );
             return false;
         }
-        
+
         // Close the file.
         if (!fclose($fp)) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR,
@@ -517,7 +557,7 @@ class PEAR_PackageUpdate {
             return false;
         } else {
             return true;
-        }        
+        }
     }
 
     /**
@@ -534,6 +574,7 @@ class PEAR_PackageUpdate {
      * @access public
      * @return boolean true if the preferences will allow an update for the
      *                 latest version.
+     * @since  0.4.0a1
      */
     function preferencesAllowUpdate()
     {
@@ -547,7 +588,7 @@ class PEAR_PackageUpdate {
             ) {
             return false;
         }
-        
+
         // Check to see if the user has requested not to be asked until a new
         // version is released.
         if (isset($prefs[PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE]) &&
@@ -557,11 +598,11 @@ class PEAR_PackageUpdate {
             ) {
             return false;
         }
-        
-        // Check to see if the user has requested not to be asked about the 
+
+        // Check to see if the user has requested not to be asked about the
         // state of the latest release.
         // Create an array of states.
-        $states = array(PEAR_PACKAGEUPDATE_STATE_DEVEL  => 0, 
+        $states = array(PEAR_PACKAGEUPDATE_STATE_DEVEL  => 0,
                         PEAR_PACKAGEUPDATE_STATE_ALPHA  => 1,
                         PEAR_PACKAGEUPDATE_STATE_BETA   => 2,
                         PEAR_PACKAGEUPDATE_STATE_STABLE => 3
@@ -595,6 +636,7 @@ class PEAR_PackageUpdate {
      *
      * @access protected
      * @return string
+     * @since  0.4.0a1
      */
     function releaseType()
     {
@@ -620,6 +662,7 @@ class PEAR_PackageUpdate {
      * @access public
      * @param  boolean $dontAsk
      * @return boolean true on success, false on failure
+     * @since  0.4.0a1
      */
     function setDontAskAgain($dontAsk)
     {
@@ -637,10 +680,11 @@ class PEAR_PackageUpdate {
      * @access public
      * @param  boolean $nextrelease
      * @return boolean true on success, false on failure
+     * @since  0.4.0a1
      */
     function setDontAskUntilNextRelease($nextrelease)
     {
-        // If nextrelease is true, we have to swap its value out with the 
+        // If nextrelease is true, we have to swap its value out with the
         // latest version.
         if ($nextrelease) {
             // Make sure that the package info was found.
@@ -662,6 +706,7 @@ class PEAR_PackageUpdate {
      * @access public
      * @param  string  $minType The minimum release type to allow.
      * @return boolean true on success, false on failure
+     * @since  0.4.0a1
      */
     function setMinimumRleaseType($minType)
     {
@@ -686,6 +731,7 @@ class PEAR_PackageUpdate {
      * @access public
      * @param  string  $minState The minimum release state to allow.
      * @return boolean true on success, false on failure
+     * @since  0.4.0a1
      */
     function setMinimumState($minState)
     {
@@ -715,6 +761,7 @@ class PEAR_PackageUpdate {
      * @param  integer   $pref  One of the preference constants.
      * @param  mixed     $value The value of the preference.
      * @return boolean   true if the preference was set and saved properly.
+     * @since  0.4.0a1
      */
     function setPreference($pref, $value)
     {
@@ -729,7 +776,7 @@ class PEAR_PackageUpdate {
                              array('preference' => $pref)
                              );
             return false;
-        }                    
+        }
 
         // Make sure the preferences for the channel exist.
         if (!isset($this->preferences[$this->channel])) {
@@ -754,6 +801,7 @@ class PEAR_PackageUpdate {
      * @access public
      * @param  array   $preferences
      * @return boolean true if the preferences were set and saved.
+     * @since  0.4.0a1
      */
     function setPreferences($preferences)
     {
@@ -791,11 +839,12 @@ class PEAR_PackageUpdate {
      *
      * It is the developers responsibility to make sure the user is given the
      * option to update any optional dependencies if needed. This can be done
-     * by creating a new instance of PEAR_PackageUpdate for the optional 
-     * dependency. 
+     * by creating a new instance of PEAR_PackageUpdate for the optional
+     * dependency.
      *
      * @access public
      * @return boolean true if the update was successful.
+     * @since  0.4.0a1
      */
     function update()
     {
@@ -809,7 +858,7 @@ class PEAR_PackageUpdate {
         $config->set('verbose', 0);
 
         // Create a command object to do the upgrade.
-        // If the current version is 0.0.0 don't upgrade. That would be a 
+        // If the current version is 0.0.0 don't upgrade. That would be a
         // sneaky way for devs to install packages without the use knowing.
         if ($this->instVersion == '0.0.0') {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_NOTINSTALLED, NULL,
@@ -845,6 +894,7 @@ class PEAR_PackageUpdate {
      * @abstract
      * @access public
      * @return void
+     * @since  0.4.0a1
      */
     function forceRestart()
     {
@@ -858,6 +908,7 @@ class PEAR_PackageUpdate {
      * @abstract
      * @access public
      * @return boolean true if the user wants to update
+     * @since  0.4.0a1
      */
     function presentUpdate()
     {
@@ -872,7 +923,7 @@ class PEAR_PackageUpdate {
      * Pushes an error onto an error stack.
      *
      * This method is just for collecting errors that occur while checking for
-     * updates and updating a package. The child class is responsible for 
+     * updates and updating a package. The child class is responsible for
      * displaying all errors and handling them properly. This is because the
      * way errors are handled varies greatly depending on the driver used.
      *
@@ -892,6 +943,7 @@ class PEAR_PackageUpdate {
      *                          if compatibility mode is on, a PEAR_Error is
      *                          also thrown.  If the class Exception exists,
      *                          then one is returned.
+     * @since  0.4.0a1
      */
     function pushError($code, $level = 'error', $params = array(),
                         $msg = false, $repackage = false, $backtrace = false)
@@ -923,6 +975,7 @@ class PEAR_PackageUpdate {
      * @access public
      * @param  object $error A PEAR_Error
      * @return mixed  The return from PEAR::ErrorStack::push()
+     * @since  0.4.0a1
      */
     function repackagePEAR_Error(&$error)
     {
@@ -959,12 +1012,13 @@ class PEAR_PackageUpdate {
      * Pops an error off the error stack.
      *
      * This method is just for collecting errors that occur while checking for
-     * updates and updating a package. The child class is responsible for 
+     * updates and updating a package. The child class is responsible for
      * displaying all errors and handling them properly. This is because the
      * way errors are handled varies greatly depending on the driver used.
      *
      * @access public
      * @return object A PEAR_Error instance or false if no errors exist.
+     * @since  0.4.0a1
      */
     function popError()
     {
@@ -976,6 +1030,7 @@ class PEAR_PackageUpdate {
      *
      * @access public
      * @return boolean
+     * @since  0.4.0a1
      */
     function hasErrors()
     {
