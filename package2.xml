@@ -20,11 +20,11 @@
   <email>pear@laurent-laville.org</email>
   <active>yes</active>
  </lead>
- <date>2006-04-25</date>
- <time>23:11:29</time>
+ <date>2006-05-07</date>
+ <time>20:41:55</time>
  <version>
-  <release>0.4.3</release>
-  <api>0.4.3</api>
+  <release>0.5.0</release>
+  <api>1.0.0</api>
  </version>
  <stability>
   <release>beta</release>
@@ -32,21 +32,28 @@
  </stability>
  <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
  <notes>* news
-- Laurent Laville was added as a leader to the package
+- more flexible implementation of the factory pattern allowing people to use custom class
+  see new example &apos;withoutFrontend.php&apos;: how to use ppu without frontend
+
+* bugs
+- fixes typos error on constants
+- fixes typos missing letter on function setMinimumReleaseType
 
 * improvements
-- fixes request #7456: improve error frame used with PEAR_ErrorStack
-- mandatory ressources that will be call in all cases are now outside the class
+- indentation of error messages array
 
 * Quality Assurance
-- PEAR cs standard for header comment blocks (see http://pear.php.net/pepr/pepr-proposal-show.php?id=128)
-- Adds since phpdoc tag to keep track of function history</notes>
+- add @throws phpdoc tag on all necessary function comment block
+ </notes>
  <contents>
   <dir baseinstalldir="PEAR" name="/">
-   <file baseinstalldir="PEAR" md5sum="e31a4d32f9bf63a17cab2b1a320f86cd" name="PackageUpdate.php" role="php">
+   <dir name="examples">
+    <file name="withoutFrontend.php" role="doc" />
+   </dir> <!-- //examples -->
+   <file name="PackageUpdate.php" role="php">
     <tasks:replace from="@version@" to="version" type="package-info" />
    </file>
-  </dir>
+  </dir> <!-- / -->
  </contents>
  <dependencies>
   <required>
@@ -66,12 +73,38 @@
    <package>
     <name>PEAR_PackageUpdate_Gtk2</name>
     <channel>pear.php.net</channel>
-    <min>0.3.0a1</min>
+    <min>0.3.1</min>
    </package>
   </group>
  </dependencies>
  <phprelease />
  <changelog>
+  <release>
+   <version>
+    <release>0.5.0</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2006-05-07</date>
+   <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
+   <notes>* news
+- more flexible implementation of the factory pattern allowing people to use custom class
+  see new example &apos;withoutFrontend.php&apos;: how to use ppu without frontend
+
+* bugs
+- fixes typos error on constants
+- fixes typos missing letter on function setMinimumReleaseType
+
+* improvements
+- indentation of error messages array
+
+* Quality Assurance
+- add @throws phpdoc tag on all necessary function comment block
+   </notes>
+  </release>
   <release>
    <version>
     <release>0.4.3</release>
