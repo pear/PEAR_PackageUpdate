@@ -57,19 +57,32 @@ define('PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER',    -12);
 
 // Error messages.
 $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
-    array(PEAR_PACKAGEUPDATE_ERROR_NOPACKAGE            => 'No package name provided',
-          PEAR_PACKAGEUPDATE_ERROR_NOCHANNEL            => 'No channel name provided',
-          PEAR_PACKAGEUPDATE_ERROR_NOINFO               => 'No update information is available for %packagename%.',
-          PEAR_PACKAGEUPDATE_ERROR_NOTINSTALLED         => '%packagename% is not installed. It cannot be updated.',
-          PEAR_PACKAGEUPDATE_ERROR_PREFFILE_READACCESS  => 'Preferences cannot be read from %file%.',
-          PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEACCESS => 'Preferences cannot be written to %file% because of access permission errors.',
-          PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR  => 'An error occurred while trying to write the preferences to %file%.',
-          PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED   => 'Preferences file is corrupted.',
-          PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE          => 'Invalid release type: %type%',
-          PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE         => 'Invalid release state: %state%',
-          PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF          => 'Invalid preference: %preference%',
-          PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER    => 'Driver %drivername% could not be found.'
-          );
+    array(
+        PEAR_PACKAGEUPDATE_ERROR_NOPACKAGE =>
+            'No package name provided',
+        PEAR_PACKAGEUPDATE_ERROR_NOCHANNEL =>
+            'No channel name provided',
+        PEAR_PACKAGEUPDATE_ERROR_NOINFO =>
+            'No update information is available for %packagename%.',
+        PEAR_PACKAGEUPDATE_ERROR_NOTINSTALLED =>
+            '%packagename% is not installed. It cannot be updated.',
+        PEAR_PACKAGEUPDATE_ERROR_PREFFILE_READACCESS =>
+            'Preferences cannot be read from %file%.',
+        PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEACCESS =>
+            'Preferences cannot be written to %file% because of access permission errors.',
+        PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR =>
+            'An error occurred while trying to write the preferences to %file%.',
+        PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED =>
+            'Preferences file is corrupted.',
+        PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE =>
+            'Invalid release type: %type%',
+        PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE =>
+            'Invalid release state: %state%',
+        PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF =>
+            'Invalid preference: %preference%',
+        PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER =>
+            'Driver %drivername% could not be found.'
+    );
 
 /**
  * The package allows a developer to add a few lines of code to
@@ -278,38 +291,43 @@ class PEAR_PackageUpdate
      * @param  string $channel     The channel the package resides on.
      * @return object An instance of type PEAR_PackageUpdate_$driver
      * @since  0.4.0a1
+     * @throws PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER
      */
     function &factory($driver, $packageName, $channel)
     {
-        // Try to include the driver.
-        $file = 'PEAR/PackageUpdate/' . $driver . '.php';
+        $class = 'PEAR_PackageUpdate_' . $driver;
 
-        if (!PEAR_PackageUpdate::isIncludable($file)) {
-            PEAR_ErrorStack::staticPush('PEAR_PackageUpdate',
-                                        PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER,
-                                        null,
-                                        array('drivername' => $driver),
-                                        $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'][PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER]
-                                        );
-            // Must assign a variable to avoid notice about references.
-            $false = false;
+        // Attempt to include a custom version of the named class, but don't treat
+        // a failure as fatal.  The caller may have already included their own
+        // version of the named class.
+        if (!class_exists($class)) {
 
-            return $false;
+            // Try to include the driver.
+            $file = 'PEAR/PackageUpdate/' . $driver . '.php';
+
+            if (!PEAR_PackageUpdate::isIncludable($file)) {
+                PEAR_ErrorStack::staticPush('PEAR_PackageUpdate',
+                                            PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER,
+                                            null,
+                                            array('drivername' => $driver),
+                                            $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'][PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER]
+                                            );
+                // Must assign a variable to avoid notice about references.
+                $false = false;
+                return $false;
+            }
+            include_once $file;
         }
-        include_once $file;
 
         // See if the class exists now.
-        $class = 'PEAR_PackageUpdate_' . $driver;
         if (!class_exists($class)) {
             // Must assign a variable to avoid notice about references.
             $false = false;
-
             return $false;
         }
 
         // Try to instantiate the class.
         $instance =& new $class($packageName, $channel);
-
         return $instance;
     }
 
@@ -348,6 +366,8 @@ class PEAR_PackageUpdate
      * @access protected
      * @return boolean   true on success, false on error
      * @since  0.4.0a1
+     * @throws PEAR_PACKAGEUPDATE_ERROR_PREFFILE_READACCESS,
+     *         PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED
      */
     function loadPreferences()
     {
@@ -448,6 +468,9 @@ class PEAR_PackageUpdate
      * @access protected
      * @return boolean   true on success, false on error
      * @since  0.4.0a1
+     * @throws PEAR_PACKAGEUPDATE_ERROR_NOPACKAGE,
+     *         PEAR_PACKAGEUPDATE_ERROR_NOCHANNEL,
+     *         PEAR_PACKAGEUPDATE_ERROR_NOINFO
      */
     function getPackageInfo()
     {
@@ -542,6 +565,8 @@ class PEAR_PackageUpdate
      * @access public
      * @return boolean true on success, false on error
      * @since  0.4.0a1
+     * @throws PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEACCESS,
+     *         PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR
      */
     function savePreferences()
     {
@@ -700,6 +725,7 @@ class PEAR_PackageUpdate
      * @param  boolean $nextrelease
      * @return boolean true on success, false on failure
      * @since  0.4.0a1
+     * @throws PEAR_PACKAGEUPDATE_ERROR_NOINFO
      */
     function setDontAskUntilNextRelease($nextrelease)
     {
@@ -726,15 +752,16 @@ class PEAR_PackageUpdate
      * @param  string  $minType The minimum release type to allow.
      * @return boolean true on success, false on failure
      * @since  0.4.0a1
+     * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE
      */
-    function setMinimumRleaseType($minType)
+    function setMinimumReleaseType($minType)
     {
         // Make sure the type is acceptable.
-        if ($minType != PEAR_PACKAGE_TYPE_BUG   &&
-            $minType != PEAR_PACKAGE_TYPE_MINOR &&
-            $minType != PEAR_PACKAGE_TYPE_MAJOR
+        if ($minType != PEAR_PACKAGEUPDATE_TYPE_BUG   &&
+            $minType != PEAR_PACKAGEUPDATE_TYPE_MINOR &&
+            $minType != PEAR_PACKAGEUPDATE_TYPE_MAJOR
             ) {
-            $this->pushError(PEAR_PACKAGEUPATE_ERROR_INVALIDTYPE, NULL,
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE, NULL,
                              array('type' => $minType)
                              );
             return false;
@@ -751,14 +778,15 @@ class PEAR_PackageUpdate
      * @param  string  $minState The minimum release state to allow.
      * @return boolean true on success, false on failure
      * @since  0.4.0a1
+     * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE
      */
     function setMinimumState($minState)
     {
         // Make sure the type is acceptable.
-        if ($minState != PEAR_PACKAGE_STATE_DEVEL  &&
-            $minState != PEAR_PACKAGE_STATE_ALPHA  &&
-            $minState != PEAR_PACKAGE_STATE_BETA   &&
-            $minState != PEAR_PACKAGE_STATE_STABLE
+        if ($minState != PEAR_PACKAGEUPDATE_STATE_DEVEL  &&
+            $minState != PEAR_PACKAGEUPDATE_STATE_ALPHA  &&
+            $minState != PEAR_PACKAGEUPDATE_STATE_BETA   &&
+            $minState != PEAR_PACKAGEUPDATE_STATE_STABLE
             ) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE, NULL,
                              array('state' => $minState)
@@ -781,6 +809,7 @@ class PEAR_PackageUpdate
      * @param  mixed     $value The value of the preference.
      * @return boolean   true if the preference was set and saved properly.
      * @since  0.4.0a1
+     * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF
      */
     function setPreference($pref, $value)
     {
@@ -791,7 +820,7 @@ class PEAR_PackageUpdate
             $pref != PEAR_PACKAGEUPDATE_PREF_STATE
             ) {
             // Invalid preference!
-            $this->pushError(PEAR_PACKAGEUPDATE_INVALIDPREF, NULL,
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF, NULL,
                              array('preference' => $pref)
                              );
             return false;
@@ -864,6 +893,7 @@ class PEAR_PackageUpdate
      * @access public
      * @return boolean true if the update was successful.
      * @since  0.4.0a1
+     * @throws PEAR_PACKAGEUPDATE_ERROR_NOTINSTALLED
      */
     function update()
     {
