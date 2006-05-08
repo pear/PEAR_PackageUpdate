@@ -16,6 +16,7 @@ require_once 'PEAR/PackageUpdate.php';
 /**
  * This class allow to use PEAR_PackageUpdate as backend without any frontend.
  * No end-user action needed.
+ * @ignore
  */
 class PEAR_PackageUpdate_Null extends PEAR_PackageUpdate
 {
