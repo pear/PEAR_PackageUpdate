@@ -24,26 +24,15 @@
   </maintainer>
   </maintainers>
  <release>
-  <version>0.5.0</version>
-  <date>2006-05-07</date>
+  <version>0.5.1</version>
+  <date>2006-07-15</date>
   <license>PHP License 3.01</license>
   <state>beta</state>
-  <notes>* news
-- more flexible implementation of the factory pattern allowing people to use custom class
-  see new example &apos;withoutFrontend.php&apos;: how to use ppu without frontend
-
-* bugs
-- fixes typos error on constants
-- fixes typos missing letter on function setMinimumReleaseType
-
-* improvements
-- indentation of error messages array
-
-* Quality Assurance
-- add @throws phpdoc tag on all necessary function comment block
+  <notes>* fixed PHP dependency :
+required at least PHP 4.3.0 due to usage of functions: get_include_path, file_get_contents
   </notes>
   <deps>
-   <dep type="php" rel="ge" version="4.1.0" optional="no"/>
+   <dep type="php" rel="ge" version="4.3.0" optional="no"/>
    <dep type="pkg" rel="ge" version="1.4.8" optional="no">PEAR</dep>
   </deps>
   <filelist>
@@ -58,6 +47,15 @@
   </filelist>
  </release>
  <changelog>
+   <release>
+    <version>0.5.1</version>
+    <date>2006-07-15</date>
+    <license>PHP License 3.01</license>
+    <state>beta</state>
+    <notes>* fixed PHP dependency :
+required at least PHP 4.3.0 due to usage of functions: get_include_path, file_get_contents
+    </notes>
+   </release>
    <release>
     <version>0.5.0</version>
     <date>2006-05-07</date>

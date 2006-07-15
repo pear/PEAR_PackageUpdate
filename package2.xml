@@ -20,10 +20,10 @@
   <email>pear@laurent-laville.org</email>
   <active>yes</active>
  </lead>
- <date>2006-05-07</date>
- <time>20:41:55</time>
+ <date>2006-07-15</date>
+ <time>15:12:47</time>
  <version>
-  <release>0.5.0</release>
+  <release>0.5.1</release>
   <api>1.0.0</api>
  </version>
  <stability>
@@ -31,20 +31,8 @@
   <api>beta</api>
  </stability>
  <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
- <notes>* news
-- more flexible implementation of the factory pattern allowing people to use custom class
-  see new example &apos;withoutFrontend.php&apos;: how to use ppu without frontend
-
-* bugs
-- fixes typos error on constants
-- fixes typos missing letter on function setMinimumReleaseType
-
-* improvements
-- indentation of error messages array
-
-* Quality Assurance
-- add @throws phpdoc tag on all necessary function comment block
- </notes>
+ <notes>* fixed PHP dependency :
+required at least PHP 4.3.0 due to usage of functions: get_include_path, file_get_contents </notes>
  <contents>
   <dir baseinstalldir="PEAR" name="/">
    <dir name="examples">
@@ -58,7 +46,7 @@
  <dependencies>
   <required>
    <php>
-    <min>4.1.0</min>
+    <min>4.3.0</min>
    </php>
    <pearinstaller>
     <min>1.4.8</min>
@@ -79,6 +67,20 @@
  </dependencies>
  <phprelease />
  <changelog>
+  <release>
+   <version>
+    <release>0.5.1</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2006-07-15</date>
+   <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
+   <notes>* fixed PHP dependency :
+required at least PHP 4.3.0 due to usage of functions: get_include_path, file_get_contents </notes>
+  </release>
   <release>
    <version>
     <release>0.5.0</release>
@@ -102,8 +104,7 @@
 - indentation of error messages array
 
 * Quality Assurance
-- add @throws phpdoc tag on all necessary function comment block
-   </notes>
+- add @throws phpdoc tag on all necessary function comment block</notes>
   </release>
   <release>
    <version>
