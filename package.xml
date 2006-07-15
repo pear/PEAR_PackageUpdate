@@ -30,6 +30,8 @@
   <state>beta</state>
   <notes>* fixed PHP dependency :
 required at least PHP 4.3.0 due to usage of functions: get_include_path, file_get_contents
+
+* add optional dependency to web/html frontend
   </notes>
   <deps>
    <dep type="php" rel="ge" version="4.3.0" optional="no"/>
@@ -54,6 +56,8 @@ required at least PHP 4.3.0 due to usage of functions: get_include_path, file_ge
     <state>beta</state>
     <notes>* fixed PHP dependency :
 required at least PHP 4.3.0 due to usage of functions: get_include_path, file_get_contents
+
+* add optional dependency to web/html frontend
     </notes>
    </release>
    <release>

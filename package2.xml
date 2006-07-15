@@ -21,7 +21,7 @@
   <active>yes</active>
  </lead>
  <date>2006-07-15</date>
- <time>15:12:47</time>
+ <time>15:26:15</time>
  <version>
   <release>0.5.1</release>
   <api>1.0.0</api>
@@ -32,7 +32,9 @@
  </stability>
  <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
  <notes>* fixed PHP dependency :
-required at least PHP 4.3.0 due to usage of functions: get_include_path, file_get_contents </notes>
+required at least PHP 4.3.0 due to usage of functions: get_include_path, file_get_contents
+
+* add optional dependency to web/html frontend</notes>
  <contents>
   <dir baseinstalldir="PEAR" name="/">
    <dir name="examples">
@@ -64,6 +66,13 @@ required at least PHP 4.3.0 due to usage of functions: get_include_path, file_ge
     <min>0.3.1</min>
    </package>
   </group>
+  <group hint="Web HTML front end for PPU" name="web">
+   <package>
+    <name>PEAR_PackageUpdate_Web</name>
+    <channel>pear.php.net</channel>
+    <min>0.2.1</min>
+   </package>
+  </group>
  </dependencies>
  <phprelease />
  <changelog>
@@ -79,7 +88,9 @@ required at least PHP 4.3.0 due to usage of functions: get_include_path, file_ge
    <date>2006-07-15</date>
    <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
    <notes>* fixed PHP dependency :
-required at least PHP 4.3.0 due to usage of functions: get_include_path, file_get_contents </notes>
+required at least PHP 4.3.0 due to usage of functions: get_include_path, file_get_contents
+
+* add optional dependency to web/html frontend</notes>
   </release>
   <release>
    <version>
