@@ -505,19 +505,33 @@ class PEAR_PackageUpdate
             return false;
         }
 
-        // Get a PEAR_Remote instance.
-        $r = $config->getRemote();
+        // Get a channel object.
+        $chan = $reg->getChannel($this->channel);
+        if ($chan->supportsREST() && $base = $chan->getBaseURL('REST1.0')) {
+            $rest =& $config->getREST('1.0', array());
+            $info =  $rest->packageInfo($base, $parsed['package']);
+        } else {
+            $r    =& $config->getRemote();
+            $info =  $r->call('package.info', $parsed['package']);
+        }
 
-        // Get the package info.
-        $info = $r->call('package.info', $parsed['package']);
+        // Reset the default channel.
+        $config->set('default_channel', $savechannel);
 
         // Check to make sure the package was found.
-        if (PEAR::isError($info)) {
+        if (PEAR::isError($info) || !isset($info['name'])) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_NOINFO, NULL,
                              array('packagename' => $this->packageName)
                              );
             return false;
         }
+
+        $installed = $reg->packageInfo($info['name'], null, $channel);
+        $info['installed'] = $installed['version'] ? $installed['version'] : '- no -';
+        if (is_array($info['installed'])) {
+            $info['installed'] = $info['installed']['release'];
+        }
+
 
         // Get the installed version of the package.
         $this->instVersion = $reg->packageInfo($parsed['package'],

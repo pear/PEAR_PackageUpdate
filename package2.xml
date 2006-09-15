@@ -20,10 +20,9 @@
   <email>pear@laurent-laville.org</email>
   <active>yes</active>
  </lead>
- <date>2006-07-15</date>
- <time>15:26:15</time>
+ <date>2006-09-15</date>
  <version>
-  <release>0.5.1</release>
+  <release>0.5.2</release>
   <api>1.0.0</api>
  </version>
  <stability>
@@ -31,10 +30,10 @@
   <api>beta</api>
  </stability>
  <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
- <notes>* fixed PHP dependency :
-required at least PHP 4.3.0 due to usage of functions: get_include_path, file_get_contents
-
-* add optional dependency to web/html frontend</notes>
+ <notes>
+  Allow updates from channels other than pear.php.net.
+  Allow updates using REST.
+ </notes>
  <contents>
   <dir baseinstalldir="PEAR" name="/">
    <dir name="examples">
@@ -76,6 +75,22 @@ required at least PHP 4.3.0 due to usage of functions: get_include_path, file_ge
  </dependencies>
  <phprelease />
  <changelog>
+  <release>
+   <version>
+    <release>0.5.2</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2006-09-15</date>
+   <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
+   <notes>
+    Allow updates from channels other than pear.php.net.
+    Allow updates using REST.
+   </notes>
+  </release>
   <release>
    <version>
     <release>0.5.1</release>
