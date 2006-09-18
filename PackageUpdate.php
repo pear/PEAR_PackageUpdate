@@ -506,7 +506,7 @@ class PEAR_PackageUpdate
         }
 
         // Get a channel object.
-        $chan = $reg->getChannel($this->channel);
+        $chan =& $reg->getChannel($this->channel);
         if ($chan->supportsREST() && $base = $chan->getBaseURL('REST1.0')) {
             $rest =& $config->getREST('1.0', array());
             $info =  $rest->packageInfo($base, $parsed['package']);
@@ -525,13 +525,6 @@ class PEAR_PackageUpdate
                              );
             return false;
         }
-
-        $installed = $reg->packageInfo($info['name'], null, $channel);
-        $info['installed'] = $installed['version'] ? $installed['version'] : '- no -';
-        if (is_array($info['installed'])) {
-            $info['installed'] = $info['installed']['release'];
-        }
-
 
         // Get the installed version of the package.
         $this->instVersion = $reg->packageInfo($parsed['package'],
