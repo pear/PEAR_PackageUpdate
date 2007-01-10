@@ -14,7 +14,7 @@
  * @category   PEAR
  * @package    PEAR_PackageUpdate
  * @author     Scott Mattocks
- * @copyright  2006 Scott Mattocks
+ * @copyright  2006-2007 Scott Mattocks
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version    CVS: $Id$
  * @link       http://pear.php.net/package/PEAR_PackageUpdate
@@ -154,7 +154,7 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
  * @category   PEAR
  * @package    PEAR_PackageUpdate
  * @author     Scott Mattocks
- * @copyright  2006 Scott Mattocks
+ * @copyright  2006-2007 Scott Mattocks
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version    Release: @version@
  * @link       http://pear.php.net/package/PEAR_PackageUpdate
@@ -216,6 +216,16 @@ class PEAR_PackageUpdate
      * @since  0.4.0a1
      */
     var $instVersion;
+
+    /**
+     * Informations about the current installed version of the package.
+     *
+     * @access protected
+     * @var    array
+     * @since  0.6.0
+     * @see    PEAR_Registry::packageInfo()
+     */
+    var $instInfo;
 
     /**
      * A collection of errors that have occurred.
@@ -531,6 +541,8 @@ class PEAR_PackageUpdate
                                                'version',
                                                $parsed['channel']
                                                );
+        // Get full installed data of the package.
+        $this->instInfo = $reg->packageInfo($parsed['package'], null, $parsed['channel']);
 
         // If the package is not installed, create a dummy version.
         if (empty($this->instVersion)) {
@@ -540,6 +552,9 @@ class PEAR_PackageUpdate
         // Pull out the latest information.
         $this->latestVersion = reset(array_keys($info['releases']));
         $this->info          = reset($info['releases']);
+        $this->info['version']     = $this->latestVersion;
+        $this->info['summary']     = $info['summary'];
+        $this->info['description'] = $info['description'];
 
         return true;
     }
@@ -704,6 +719,59 @@ class PEAR_PackageUpdate
         }
 
         return $type;
+    }
+
+    /**
+     * Returns informations about current installed version of the package
+     *
+     * @author Laurent Laville
+     * @access public
+     * @return array|bool   false on error, data array otherwise
+     * @since  0.6.0
+     */
+    function getInstalledRelease()
+    {
+        if (!$this->getPackageInfo()) {
+            return false;
+        }
+        // compatibility for package.xml version 2.0
+        if (isset($this->instInfo['old'])) {
+            $instInfo = $this->instInfo['old'];
+            $instInfo['packagerversion'] = $this->instInfo['attribs']['packagerversion'];
+        } else {
+            $instInfo = $this->instInfo;
+        }
+        $info = array(
+            'version'         => $instInfo['version'],
+            'license'         => $instInfo['release_license'],
+            'summary'         => $this->instInfo['summary'],
+            'description'     => $this->instInfo['description'],
+            'releasedate'     => $instInfo['release_date'],
+            'releasenotes'    => $instInfo['release_notes'],
+            'state'           => $instInfo['release_state'],
+            'deps'            => $instInfo['release_deps'],
+            'xsdversion'      => $this->instInfo['xsdversion'],
+            'packagerversion' => $instInfo['packagerversion'],
+        );
+        return $info;
+    }
+
+    /**
+     * Returns information on latest version available
+     *
+     * @author Laurent Laville
+     * @access public
+     * @return array|bool   false on error, data array otherwise
+     * @since  0.6.0
+     */
+    function getLatestRelease()
+    {
+        if (!$this->getPackageInfo()) {
+            return false;
+        }
+        $info = $this->info;
+        unset($info['doneby']);
+        return $info;
     }
 
     /**
