@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.4.9" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package packagerversion="1.5.0RC3" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>PEAR_PackageUpdate</name>
  <channel>pear.php.net</channel>
  <summary>A simple way to update packages at run time.</summary>
@@ -20,9 +20,10 @@
   <email>pear@laurent-laville.org</email>
   <active>yes</active>
  </lead>
- <date>2006-09-18</date>
+ <date>2007-01-11</date>
+ <time>10:59:43</time>
  <version>
-  <release>0.5.2</release>
+  <release>0.6.0</release>
   <api>1.0.0</api>
  </version>
  <stability>
@@ -30,15 +31,27 @@
   <api>beta</api>
  </stability>
  <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
- <notes>
-  Allow updates from channels other than pear.php.net.
-  Allow updates using REST.
+ <notes>* IMPORTANT
+This beta version will be the last one before final stable release 1.0.0
+
+* news
+- two new functions: getInstalledRelease() and getLatestRelease(), to easily
+retrieve informations (release date, notes, version, state, dependencies, ...)
+about installed and latest version available of a package.
+
+TIP: usefull if you want to alert web admin of an auto-update with all necessary informations.
+
+* changes
+- drop support of package xml version 1.0
+- example withoutFrontend.php updated (PEAR_PackageUpdate_Null class is now reusable)
  </notes>
  <contents>
   <dir baseinstalldir="PEAR" name="/">
    <dir name="examples">
+    <file name="CliFrontend.php" role="doc" />
     <file name="withoutFrontend.php" role="doc" />
    </dir> <!-- //examples -->
+   <file name="Cli.php" role="php" />
    <file name="PackageUpdate.php" role="php">
     <tasks:replace from="@version@" to="version" type="package-info" />
    </file>
@@ -77,6 +90,32 @@
  <changelog>
   <release>
    <version>
+    <release>0.6.0</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2007-01-11</date>
+   <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
+   <notes>* IMPORTANT
+This beta version will be the last one before final stable release 1.0.0
+
+* news
+- two new functions: getInstalledRelease() and getLatestRelease(), to easily
+retrieve informations (release date, notes, version, state, dependencies, ...)
+about installed and latest version available of a package.
+
+TIP: usefull if you want to alert web admin of an auto-update with all necessary informations.
+
+* changes
+- drop support of package xml version 1.0
+- example withoutFrontend.php updated (PEAR_PackageUpdate_Null class is now reusable)
+   </notes>
+  </release>
+  <release>
+   <version>
     <release>0.5.2</release>
     <api>1.0.0</api>
    </version>
@@ -86,10 +125,8 @@
    </stability>
    <date>2006-09-18</date>
    <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
-   <notes>
-    Allow updates from channels other than pear.php.net.
-    Allow updates using REST.
-   </notes>
+   <notes>Allow updates from channels other than pear.php.net.
+Allow updates using REST.</notes>
   </release>
   <release>
    <version>
