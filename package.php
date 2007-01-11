@@ -50,6 +50,10 @@ retrieve informations (release date, notes, version, state, dependencies, ...)
 about installed and latest version available of a package.
 
 TIP: usefull if you want to alert web admin of an auto-update with all necessary informations.
+
+* changes
+- drop support of package xml version 1.0
+- example withoutFrontend.php updated (PEAR_PackageUpdate_Null class is now reusable)
 ');
 
 if (isset($_GET['make']) || (isset($_SERVER['argv']) && @$_SERVER['argv'][1] == 'make')) {
