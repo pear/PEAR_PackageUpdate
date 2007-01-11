@@ -39,12 +39,14 @@ $options = array('filelistgenerator' => 'cvs',
 $p2 = &PEAR_PackageFileManager2::importOptions($packagefile, $options);
 $p2->setPackageType('php');
 $p2->addRelease();
-$p2->generateContents();
 $p2->setReleaseVersion('0.6.0');
 $p2->setAPIVersion('1.0.0');
 $p2->setReleaseStability('beta');
 $p2->setAPIStability('beta');
-$p2->setNotes('* news
+$p2->setNotes('* IMPORTANT
+This beta version will be the last one before final stable release 1.0.0
+
+* news
 - two new functions: getInstalledRelease() and getLatestRelease(), to easily
 retrieve informations (release date, notes, version, state, dependencies, ...)
 about installed and latest version available of a package.
@@ -55,6 +57,8 @@ TIP: usefull if you want to alert web admin of an auto-update with all necessary
 - drop support of package xml version 1.0
 - example withoutFrontend.php updated (PEAR_PackageUpdate_Null class is now reusable)
 ');
+$p2->addInstallAs('Cli.php', 'PackageUpdate/Cli.php');
+$p2->generateContents();
 
 if (isset($_GET['make']) || (isset($_SERVER['argv']) && @$_SERVER['argv'][1] == 'make')) {
     $p2->writePackageFile();
