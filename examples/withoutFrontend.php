@@ -23,8 +23,6 @@ class PEAR_PackageUpdate_Null extends PEAR_PackageUpdate
     function PEAR_PackageUpdate_Null($packageName, $channel)
     {
         parent::PEAR_PackageUpdate($packageName, $channel);
-        $this->setMinimumState(PEAR_PACKAGEUPDATE_STATE_STABLE);
-        $this->setMinimumReleaseType(PEAR_PACKAGEUPDATE_TYPE_BUG);
     }
 
     function forceRestart()
@@ -41,6 +39,8 @@ class PEAR_PackageUpdate_Null extends PEAR_PackageUpdate
 $ppu =& PEAR_PackageUpdate::factory('Null', 'Log', 'pear');
 if ($ppu !== false) {
     // Check for new stable version
+    $ppu->setMinimumState(PEAR_PACKAGEUPDATE_STATE_STABLE);
+    $ppu->setMinimumReleaseType(PEAR_PACKAGEUPDATE_TYPE_BUG);
     if ($ppu->checkUpdate()) {
         // Update your local copy
         ob_start();
