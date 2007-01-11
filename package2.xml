@@ -21,7 +21,7 @@
   <active>yes</active>
  </lead>
  <date>2007-01-11</date>
- <time>10:59:43</time>
+ <time>11:24:01</time>
  <version>
   <release>0.6.0</release>
   <api>1.0.0</api>
@@ -48,11 +48,11 @@ TIP: usefull if you want to alert web admin of an auto-update with all necessary
  <contents>
   <dir baseinstalldir="PEAR" name="/">
    <dir name="examples">
-    <file name="CliFrontend.php" role="doc" />
-    <file name="withoutFrontend.php" role="doc" />
+    <file baseinstalldir="PEAR" name="CliFrontend.php" role="doc" />
+    <file baseinstalldir="PEAR" name="withoutFrontend.php" role="doc" />
    </dir> <!-- //examples -->
-   <file name="Cli.php" role="php" />
-   <file name="PackageUpdate.php" role="php">
+   <file baseinstalldir="PEAR" name="Cli.php" role="php" />
+   <file baseinstalldir="PEAR" name="PackageUpdate.php" role="php">
     <tasks:replace from="@version@" to="version" type="package-info" />
    </file>
   </dir> <!-- / -->
@@ -86,7 +86,11 @@ TIP: usefull if you want to alert web admin of an auto-update with all necessary
    </package>
   </group>
  </dependencies>
- <phprelease />
+ <phprelease>
+  <filelist>
+   <install as="PackageUpdate/Cli.php" name="Cli.php" />
+  </filelist>
+ </phprelease>
  <changelog>
   <release>
    <version>
