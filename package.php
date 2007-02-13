@@ -39,23 +39,16 @@ $options = array('filelistgenerator' => 'cvs',
 $p2 = &PEAR_PackageFileManager2::importOptions($packagefile, $options);
 $p2->setPackageType('php');
 $p2->addRelease();
-$p2->setReleaseVersion('0.6.0');
+$p2->setReleaseVersion('0.6.1');
 $p2->setAPIVersion('1.0.0');
 $p2->setReleaseStability('beta');
-$p2->setAPIStability('beta');
-$p2->setNotes('* IMPORTANT
-This beta version will be the last one before final stable release 1.0.0
-
-* news
-- two new functions: getInstalledRelease() and getLatestRelease(), to easily
-retrieve informations (release date, notes, version, state, dependencies, ...)
-about installed and latest version available of a package.
-
-TIP: usefull if you want to alert web admin of an auto-update with all necessary informations.
+$p2->setAPIStability('stable');
+$p2->setNotes('* bugs
+- fix bug #10080: PEAR_Config::singleton() should be able to be used in update()
 
 * changes
-- drop support of package xml version 1.0
-- example withoutFrontend.php updated (PEAR_PackageUpdate_Null class is now reusable)
+- API stability was changed from beta to stable
+- examples/withoutFrontend.php script was changed a bit to clarify Doc bug #10079
 ');
 $p2->addInstallAs('Cli.php', 'PackageUpdate/Cli.php');
 $p2->generateContents();

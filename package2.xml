@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.5.0RC3" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package packagerversion="1.5.0" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>PEAR_PackageUpdate</name>
  <channel>pear.php.net</channel>
  <summary>A simple way to update packages at run time.</summary>
@@ -20,39 +20,32 @@
   <email>pear@laurent-laville.org</email>
   <active>yes</active>
  </lead>
- <date>2007-01-11</date>
- <time>11:24:01</time>
+ <date>2007-02-13</date>
+ <time>11:31:49</time>
  <version>
-  <release>0.6.0</release>
+  <release>0.6.1</release>
   <api>1.0.0</api>
  </version>
  <stability>
   <release>beta</release>
-  <api>beta</api>
+  <api>stable</api>
  </stability>
  <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
- <notes>* IMPORTANT
-This beta version will be the last one before final stable release 1.0.0
-
-* news
-- two new functions: getInstalledRelease() and getLatestRelease(), to easily
-retrieve informations (release date, notes, version, state, dependencies, ...)
-about installed and latest version available of a package.
-
-TIP: usefull if you want to alert web admin of an auto-update with all necessary informations.
+ <notes>* bugs
+- fix bug #10080: PEAR_Config::singleton() should be able to be used in update()
 
 * changes
-- drop support of package xml version 1.0
-- example withoutFrontend.php updated (PEAR_PackageUpdate_Null class is now reusable)
+- API stability was changed from beta to stable
+- examples/withoutFrontend.php script was changed a bit to clarify Doc bug #10079
  </notes>
  <contents>
   <dir baseinstalldir="PEAR" name="/">
    <dir name="examples">
-    <file baseinstalldir="PEAR" name="CliFrontend.php" role="doc" />
-    <file baseinstalldir="PEAR" name="withoutFrontend.php" role="doc" />
+    <file name="CliFrontend.php" role="doc" />
+    <file name="withoutFrontend.php" role="doc" />
    </dir> <!-- //examples -->
-   <file baseinstalldir="PEAR" name="Cli.php" role="php" />
-   <file baseinstalldir="PEAR" name="PackageUpdate.php" role="php">
+   <file name="Cli.php" role="php" />
+   <file name="PackageUpdate.php" role="php">
     <tasks:replace from="@version@" to="version" type="package-info" />
    </file>
   </dir> <!-- / -->
@@ -94,6 +87,25 @@ TIP: usefull if you want to alert web admin of an auto-update with all necessary
  <changelog>
   <release>
    <version>
+    <release>0.6.1</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>stable</api>
+   </stability>
+   <date>2007-02-13</date>
+   <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
+   <notes>* bugs
+- fix bug #10080: PEAR_Config::singleton() should be able to be used in update()
+
+* changes
+- API stability was changed from beta to stable
+- examples/withoutFrontend.php script was changed a bit to clarify Doc bug #10079
+   </notes>
+  </release>
+  <release>
+   <version>
     <release>0.6.0</release>
     <api>1.0.0</api>
    </version>
@@ -115,8 +127,7 @@ TIP: usefull if you want to alert web admin of an auto-update with all necessary
 
 * changes
 - drop support of package xml version 1.0
-- example withoutFrontend.php updated (PEAR_PackageUpdate_Null class is now reusable)
-   </notes>
+- example withoutFrontend.php updated (PEAR_PackageUpdate_Null class is now reusable)</notes>
   </release>
   <release>
    <version>
