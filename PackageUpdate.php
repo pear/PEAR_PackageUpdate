@@ -501,7 +501,7 @@ class PEAR_PackageUpdate
         }
 
         // Create a config object.
-        $config = new PEAR_Config();
+        $config  =& PEAR_Config::singleton();
 
         // Get the config's registry object.
         $reg = $config->getRegistry();
@@ -973,7 +973,7 @@ class PEAR_PackageUpdate
     function update()
     {
         // Create a config object.
-        $config  = new PEAR_Config();
+        $config  =& PEAR_Config::singleton();
 
         // Change the verbosity but keep track of the value to reset it just in
         // case this does something permanent.
