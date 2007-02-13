@@ -36,7 +36,7 @@ class PEAR_PackageUpdate_Null extends PEAR_PackageUpdate
 }
 
 // Check for updates of PEAR::Log package though pear.php.net channel
-$ppu =& PEAR_PackageUpdate::factory('Null', 'Log', 'pear');
+$ppu =& PEAR_PackageUpdate::factory('Null', 'Log', 'peer');
 if ($ppu !== false) {
     // Check for new stable version
     $ppu->setMinimumState(PEAR_PACKAGEUPDATE_STATE_STABLE);
@@ -50,6 +50,19 @@ if ($ppu !== false) {
         }
         ob_end_clean();
     }
+}
+
+// Check for errors.
+if ($ppu->hasErrors()) {
+    $error = $ppu->popError();
+    echo "<b>Error occured when trying to update: PEAR::Log package</b> <br />\n";
+    echo "<b>Message:</b> " . $error['message'] ."<br />\n";
+    echo "<hr /><i>Context:</i><br />\n";
+    echo "<b>File:</b> " . $error['context']['file'] ."<br />\n";
+    echo "<b>Line:</b> " . $error['context']['line'] ."<br />\n";
+    echo "<b>Function:</b> " . $error['context']['function'] ."<br />\n";
+    echo "<b>Class:</b> " . $error['context']['class'] ."<br />\n";
+    exit();
 }
 
 // your application code goes here ...
