@@ -14,6 +14,8 @@
  * @category   PEAR
  * @package    PEAR_PackageUpdate
  * @author     Scott Mattocks
+ * @author     Laurent Laville
+ * @author     Ian Eure (credits for repackage PEAR_Errors for use with ErrorStack)
  * @copyright  2006-2007 Scott Mattocks
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version    CVS: $Id$
@@ -154,6 +156,8 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
  * @category   PEAR
  * @package    PEAR_PackageUpdate
  * @author     Scott Mattocks
+ * @author     Laurent Laville
+ * @author     Ian Eure (credits for repackage PEAR_Errors for use with ErrorStack)
  * @copyright  2006-2007 Scott Mattocks
  * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version    Release: @version@
@@ -242,12 +246,14 @@ class PEAR_PackageUpdate
      * @access public
      * @param  string $packageName The package to update.
      * @param  string $channel     The channel the package resides on.
+     * @param  string $user_file   (optional) file to read PEAR user-defined options from
+     * @param  string $system_file (optional) file to read PEAR system-wide defaults from
      * @return void
      * @since  0.4.0a1
      */
-    function PEAR_PackageUpdate($packageName, $channel)
+    function PEAR_PackageUpdate($packageName, $channel, $user_file = '', $system_file = '')
     {
-        PEAR_PackageUpdate::__construct($packageName, $channel);
+        PEAR_PackageUpdate::__construct($packageName, $channel, $user_file, $system_file);
     }
 
     /**
@@ -256,10 +262,12 @@ class PEAR_PackageUpdate
      * @access public
      * @param  string $packageName The package to update.
      * @param  string $channel     The channel the package resides on.
+     * @param  string $user_file   (optional) file to read PEAR user-defined options from
+     * @param  string $system_file (optional) file to read PEAR system-wide defaults from
      * @return void
      * @since  0.4.0a1
      */
-    function __construct($packageName, $channel)
+    function __construct($packageName, $channel, $user_file = '', $system_file = '')
     {
         // Create a pear error stack.
         $this->errors =& PEAR_ErrorStack::singleton(get_class($this));
@@ -268,6 +276,10 @@ class PEAR_PackageUpdate
         // Set the package name and channel.
         $this->packageName = $packageName;
         $this->channel     = $channel;
+        // Set the file to read PEAR user-defined options from
+        $this->user_file   = $user_file;
+        // Set the file to read PEAR system-wide defaults from
+        $this->system_file = $system_file;
 
         // Load the user's preferences.
         $this->loadPreferences();
@@ -501,7 +513,7 @@ class PEAR_PackageUpdate
         }
 
         // Create a config object.
-        $config  =& PEAR_Config::singleton();
+        $config  =& PEAR_Config::singleton($this->user_file, $this->system_file);
 
         // Get the config's registry object.
         $reg = $config->getRegistry();
@@ -524,9 +536,6 @@ class PEAR_PackageUpdate
             $r    =& $config->getRemote();
             $info =  $r->call('package.info', $parsed['package']);
         }
-
-        // Reset the default channel.
-        $config->set('default_channel', $savechannel);
 
         // Check to make sure the package was found.
         if (PEAR::isError($info) || !isset($info['name'])) {
