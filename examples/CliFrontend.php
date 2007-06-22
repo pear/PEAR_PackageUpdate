@@ -37,13 +37,18 @@ if ($ppu !== false) {
         print "Your local copy is now up-to-date";
     } else {
         $inst = $ppu->getInstalledRelease();
-        $vers = $inst['version'] . ' (' . $inst['state'] . ')';
-        print "You are still using version $vers of package $channel/$packageName \n";
-        print "which depend on packages : \n";
-        foreach ($inst['deps'] as $dep) {
-            if ($dep['type'] === 'pkg') {
-                print "- " . $dep['channel'] .'/'. $dep['name'] . "\n";
+        if (is_array($inst)) {
+            //
+            $vers = $inst['version'] . ' (' . $inst['state'] . ')';
+            print "You are still using version $vers of package $channel/$packageName \n";
+            print "which depend on packages : \n";
+            foreach ($inst['deps'] as $dep) {
+                if ($dep['type'] === 'pkg') {
+                    print "- " . $dep['channel'] .'/'. $dep['name'] . "\n";
+                }
             }
+        } else {
+            print "Package $channel/$packageName is not installed \n";
         }
     }
 }
