@@ -39,16 +39,21 @@ $options = array('filelistgenerator' => 'cvs',
 $p2 = &PEAR_PackageFileManager2::importOptions($packagefile, $options);
 $p2->setPackageType('php');
 $p2->addRelease();
-$p2->setReleaseVersion('0.6.1');
+$p2->setReleaseVersion('0.7.0');
 $p2->setAPIVersion('1.0.0');
 $p2->setReleaseStability('beta');
 $p2->setAPIStability('stable');
 $p2->setNotes('* bugs
-- fix bug #10080: PEAR_Config::singleton() should be able to be used in update()
+- fix bug #11384: Undefined variable
+  This solved also the problem to PEAR non standard installation,
+  by giving file to read PEAR user-defined options from
+  and/or file to read PEAR system-wide defaults from
 
 * changes
-- API stability was changed from beta to stable
-- examples/withoutFrontend.php script was changed a bit to clarify Doc bug #10079
+- examples/CliFrontend.php script was changed a bit to prevent notice error if package is not installed
+- add myself (Laurent Laville) as co-author, in header comment blocks.
+- add credit, in header comment blocks, to Ian Eure for his function (example)
+  to repackage PEAR_Errors for use with ErrorStack
 ');
 $p2->addInstallAs('Cli.php', 'PackageUpdate/Cli.php');
 $p2->generateContents();
