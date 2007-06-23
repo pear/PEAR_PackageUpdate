@@ -55,9 +55,9 @@
 
 class PEAR_PackageUpdate_Cli extends PEAR_PackageUpdate
 {
-    function PEAR_PackageUpdate_Cli($packageName, $channel)
+    function PEAR_PackageUpdate_Cli($packageName, $channel, $user_file = '', $system_file = '')
     {
-        parent::PEAR_PackageUpdate($packageName, $channel);
+        parent::PEAR_PackageUpdate($packageName, $channel, $user_file, $system_file);
     }
 
     function forceRestart()
