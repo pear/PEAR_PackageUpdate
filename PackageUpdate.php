@@ -612,12 +612,12 @@ class PEAR_PackageUpdate
 
         // Get full installed data of the package.
         $this->instInfo = $reg->packageInfo($parsed['package'], null, $parsed['channel']);
+//        var_dump($this->instInfo);
         if (is_null($this->instInfo)) {
-            $releases = array();
+            $this->instVersion = '';
         } else {
-            $releases = $this->instInfo['releases'];
+            $this->instVersion = $this->instInfo['version']['release'];
         }
-        $this->instVersion = reset(array_keys($releases));
 
         // If the package is not installed, create a dummy version.
         if (empty($this->instVersion)) {
