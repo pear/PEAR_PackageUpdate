@@ -1112,7 +1112,7 @@ class PEAR_PackageUpdate
         }
 
         // Append the error onto the stack.
-        return $this->errors->push($code, null, $params, $msg,
+        return $this->errors->push($code, $level, $params, $msg,
                                    $repackage, $backtrace
                                    );
     }
