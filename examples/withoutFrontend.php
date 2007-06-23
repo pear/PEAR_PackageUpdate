@@ -20,9 +20,9 @@ require_once 'PEAR/PackageUpdate.php';
  */
 class PEAR_PackageUpdate_Null extends PEAR_PackageUpdate
 {
-    function PEAR_PackageUpdate_Null($packageName, $channel, $user_file = '', $system_file = '')
+    function PEAR_PackageUpdate_Null($packageName, $channel, $user_file = '', $system_file = '', $pref_file = '')
     {
-        parent::PEAR_PackageUpdate($packageName, $channel, $user_file, $system_file);
+        parent::PEAR_PackageUpdate($packageName, $channel, $user_file, $system_file, $pref_file);
     }
 
     function forceRestart()
