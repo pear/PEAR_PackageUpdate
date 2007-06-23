@@ -56,6 +56,7 @@ define('PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE',          -9);
 define('PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE',         -10);
 define('PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF',          -11);
 define('PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER',    -12);
+define('PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE',       -13);
 
 // Error messages.
 $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
@@ -83,7 +84,9 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
         PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF =>
             'Invalid preference: %preference%',
         PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER =>
-            'Driver %drivername% could not be found.'
+            'Driver %drivername% could not be found.',
+        PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE =>
+            'Invalid (%layer%) INI file : %file%'
     );
 
 /**
@@ -276,6 +279,19 @@ class PEAR_PackageUpdate
         // Set the package name and channel.
         $this->packageName = $packageName;
         $this->channel     = $channel;
+
+        if ($user_file && !file_exists($user_file)) {
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE,
+                             'warning', array('layer' => 'user', 'file' => $user_file)
+                             );
+            $user_file = ''; // force to use default user configuration
+        }
+        if ($system_file && !file_exists($system_file)) {
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE,
+                             'warning', array('layer' => 'system', 'file' => $system_file)
+                             );
+            $system_file = ''; // force to use default system configuration
+        }
         // Set the file to read PEAR user-defined options from
         $this->user_file   = $user_file;
         // Set the file to read PEAR system-wide defaults from
@@ -311,11 +327,13 @@ class PEAR_PackageUpdate
      * @param  string $driver The type of PPU to create.
      * @param  string $packageName The package to update.
      * @param  string $channel     The channel the package resides on.
+     * @param  string $user_file   (optional) file to read PEAR user-defined options from
+     * @param  string $system_file (optional) file to read PEAR system-wide defaults from
      * @return object An instance of type PEAR_PackageUpdate_$driver
      * @since  0.4.0a1
      * @throws PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER
      */
-    function &factory($driver, $packageName, $channel)
+    function &factory($driver, $packageName, $channel, $user_file = '', $system_file = '')
     {
         $class = 'PEAR_PackageUpdate_' . $driver;
 
@@ -349,7 +367,7 @@ class PEAR_PackageUpdate
         }
 
         // Try to instantiate the class.
-        $instance =& new $class($packageName, $channel);
+        $instance =& new $class($packageName, $channel, $user_file, $system_file);
         return $instance;
     }
 
@@ -982,7 +1000,7 @@ class PEAR_PackageUpdate
     function update()
     {
         // Create a config object.
-        $config  =& PEAR_Config::singleton();
+        $config  =& PEAR_Config::singleton($this->user_file, $this->system_file);
 
         // Change the verbosity but keep track of the value to reset it just in
         // case this does something permanent.
