@@ -1178,13 +1178,15 @@ class PEAR_PackageUpdate
     /**
      * Returns whether or not errors have occurred (and been captured).
      *
+     * @param  string|array $level  Level name.  Use to determine if any errors
+     *                              of level (string), or levels (array) have been pushed
      * @access public
      * @return boolean
      * @since  0.4.0a1
      */
-    function hasErrors()
+    function hasErrors($level = false)
     {
-        return $this->errors->hasErrors();
+        return $this->errors->hasErrors($level);
     }
 }
 /*
