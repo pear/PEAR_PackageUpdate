@@ -180,6 +180,33 @@ class PEAR_PackageUpdate
     var $preferences = array();
 
     /**
+     * The file to read PPU user-defined options from
+     *
+     * @access public
+     * @var    string
+     * @since  0.7.0
+     */
+    var $pref_file;
+
+    /**
+     * The file to read PEAR user-defined options from
+     *
+     * @access public
+     * @var    string
+     * @since  0.7.0
+     */
+    var $user_file;
+
+    /**
+     * The file to read PEAR system-wide defaults from
+     *
+     * @access public
+     * @var    string
+     * @since  0.7.0
+     */
+    var $system_file;
+
+    /**
      * The name of the package.
      *
      * @access public
@@ -251,12 +278,13 @@ class PEAR_PackageUpdate
      * @param  string $channel     The channel the package resides on.
      * @param  string $user_file   (optional) file to read PEAR user-defined options from
      * @param  string $system_file (optional) file to read PEAR system-wide defaults from
+     * @param  string $pref_file   (optional) file to read PPU user-defined options from
      * @return void
      * @since  0.4.0a1
      */
-    function PEAR_PackageUpdate($packageName, $channel, $user_file = '', $system_file = '')
+    function PEAR_PackageUpdate($packageName, $channel, $user_file = '', $system_file = '', $pref_file = '')
     {
-        PEAR_PackageUpdate::__construct($packageName, $channel, $user_file, $system_file);
+        PEAR_PackageUpdate::__construct($packageName, $channel, $user_file, $system_file, $pref_file);
     }
 
     /**
@@ -267,10 +295,12 @@ class PEAR_PackageUpdate
      * @param  string $channel     The channel the package resides on.
      * @param  string $user_file   (optional) file to read PEAR user-defined options from
      * @param  string $system_file (optional) file to read PEAR system-wide defaults from
+     * @param  string $pref_file   (optional) file to read PPU user-defined options from
      * @return void
      * @since  0.4.0a1
+     * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE
      */
-    function __construct($packageName, $channel, $user_file = '', $system_file = '')
+    function __construct($packageName, $channel, $user_file = '', $system_file = '', $pref_file = '')
     {
         // Create a pear error stack.
         $this->errors =& PEAR_ErrorStack::singleton(get_class($this));
@@ -282,13 +312,13 @@ class PEAR_PackageUpdate
 
         if ($user_file && !file_exists($user_file)) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE,
-                             'warning', array('layer' => 'user', 'file' => $user_file)
+                             'warning', array('layer' => 'pear-user', 'file' => $user_file)
                              );
             $user_file = ''; // force to use default user configuration
         }
         if ($system_file && !file_exists($system_file)) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE,
-                             'warning', array('layer' => 'system', 'file' => $system_file)
+                             'warning', array('layer' => 'pear-system', 'file' => $system_file)
                              );
             $system_file = ''; // force to use default system configuration
         }
@@ -296,9 +326,11 @@ class PEAR_PackageUpdate
         $this->user_file   = $user_file;
         // Set the file to read PEAR system-wide defaults from
         $this->system_file = $system_file;
+        // Set the file to read PPU user-defined options from
+        $this->pref_file   = $pref_file;
 
         // Load the user's preferences.
-        $this->loadPreferences();
+        $this->loadPreferences($pref_file);
     }
 
     /**
@@ -329,11 +361,12 @@ class PEAR_PackageUpdate
      * @param  string $channel     The channel the package resides on.
      * @param  string $user_file   (optional) file to read PEAR user-defined options from
      * @param  string $system_file (optional) file to read PEAR system-wide defaults from
+     * @param  string $pref_file   (optional) file to read PPU user-defined options from
      * @return object An instance of type PEAR_PackageUpdate_$driver
      * @since  0.4.0a1
      * @throws PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER
      */
-    function &factory($driver, $packageName, $channel, $user_file = '', $system_file = '')
+    function &factory($driver, $packageName, $channel, $user_file = '', $system_file = '', $pref_file = '')
     {
         $class = 'PEAR_PackageUpdate_' . $driver;
 
@@ -367,7 +400,7 @@ class PEAR_PackageUpdate
         }
 
         // Try to instantiate the class.
-        $instance =& new $class($packageName, $channel, $user_file, $system_file);
+        $instance =& new $class($packageName, $channel, $user_file, $system_file, $pref_file);
         return $instance;
     }
 
@@ -403,22 +436,35 @@ class PEAR_PackageUpdate
      * of preferences for each package that has been checked for
      * updates so far.
      *
+     * @param  string $pref_file   (optional) file to read PPU user-defined options from
      * @access protected
      * @return boolean   true on success, false on error
      * @since  0.4.0a1
      * @throws PEAR_PACKAGEUPDATE_ERROR_PREFFILE_READACCESS,
-     *         PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED
+     *         PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED,
+     *         PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE
      */
-    function loadPreferences()
+    function loadPreferences($pref_file = '')
     {
+        if ($pref_file && !file_exists($pref_file)) {
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE,
+                             'warning', array('layer' => 'ppu-pref', 'file' => $pref_file)
+                             );
+            $pref_file = ''; // force to use default PPU configuration
+        }
+
         // Get the preferences file.
-        $prefFile = $this->determinePrefFile();
+        if (empty($pref_file)) {
+            $prefFile = $this->determinePrefFile();
+        } else {
+            $prefFile = $pref_file;
+        }
 
         // Make sure the prefFile exists.
         if (!@file_exists($prefFile)) {
             // Try to create it by saving the current preferences (probably
             // just an empty array).
-            $this->savePreferences();
+            $this->savePreferences($prefFile);
         }
 
         // Make sure the prefFile is readable.
@@ -443,6 +489,7 @@ class PEAR_PackageUpdate
         }
 
         $this->preferences = $preferences;
+        $this->pref_file = $prefFile;
 
         return true;
     }
@@ -609,18 +656,23 @@ class PEAR_PackageUpdate
     }
 
     /**
-     * Saves the current prefernces to the RC file.
+     * Saves the current preferences to the RC file.
      *
+     * @param  string $pref_file   (optional) file to save PPU user-defined options to
      * @access public
      * @return boolean true on success, false on error
      * @since  0.4.0a1
      * @throws PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEACCESS,
      *         PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR
      */
-    function savePreferences()
+    function savePreferences($pref_file = '')
     {
         // Get the file to save the preferences to.
-        $prefFile = $this->determinePrefFile();
+        if (empty($pref_file)) {
+            $prefFile = $this->determinePrefFile();
+        } else {
+            $prefFile = $pref_file;
+        }
 
         // Open the file for writing.
         $fp = fopen($prefFile, 'w');
@@ -649,6 +701,7 @@ class PEAR_PackageUpdate
                              );
             return false;
         } else {
+            $this->pref_file = $prefFile;
             return true;
         }
     }
@@ -942,7 +995,7 @@ class PEAR_PackageUpdate
         $this->preferences[$this->channel][$this->packageName][$pref] = $value;
 
         // Save the preferences.
-        return $this->savePreferences();
+        return $this->savePreferences($this->pref_file);
     }
 
     /**
@@ -978,7 +1031,7 @@ class PEAR_PackageUpdate
         $this->preferences[$this->channel][$this->packageName] = $preferences;
 
         // Save the preferences.
-        return $this->savePreferences();
+        return $this->savePreferences($this->pref_file);
     }
 
     /**
