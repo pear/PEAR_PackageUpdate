@@ -520,7 +520,7 @@ class PEAR_PackageUpdate
      * Checks to see if an update is available.
      *
      * Respects the user preferences when determining if an
-     * update is avaiable. Returns true if an update is available
+     * update is available. Returns true if an update is available
      * and the user may want to update the package.
      *
      * @access public
@@ -531,7 +531,7 @@ class PEAR_PackageUpdate
     {
         // Check to see if an update is available.
         if (empty($this->latestVersion) || empty ($this->info)) {
-            if (!$this->getPackageInfo()) {
+            if (!$this->getInstalledRelease()) {
                 return false;
             }
         }
@@ -610,13 +610,14 @@ class PEAR_PackageUpdate
             return false;
         }
 
-        // Get the installed version of the package.
-        $this->instVersion = $reg->packageInfo($parsed['package'],
-                                               'version',
-                                               $parsed['channel']
-                                               );
         // Get full installed data of the package.
         $this->instInfo = $reg->packageInfo($parsed['package'], null, $parsed['channel']);
+        if (is_null($this->instInfo)) {
+            $releases = array();
+        } else {
+            $releases = $this->instInfo['releases'];
+        }
+        $this->instVersion = reset(array_keys($releases));
 
         // If the package is not installed, create a dummy version.
         if (empty($this->instVersion)) {
