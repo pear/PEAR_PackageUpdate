@@ -18,19 +18,36 @@ require_once 'PEAR/PackageUpdate.php';
 $channel     = 'pear';
 $packageName = 'Config';
 
-$ppu =& PEAR_PackageUpdate::factory('Cli', $packageName, $channel);
+$ppu =& PEAR_PackageUpdate::factory('Cli', $packageName, $channel, 'c:\wamp\php\pear.ini', '', 'c:\wamp\php\ppurc.ini');
 if ($ppu !== false) {
     $ppu->setMinimumState(PEAR_PACKAGEUPDATE_STATE_STABLE);
     $ppu->setMinimumReleaseType(PEAR_PACKAGEUPDATE_TYPE_BUG);
     // Check for new stable version
     if ($ppu->checkUpdate()) {
 
-        $rel = $ppu->getLatestRelease();
-        $vers = $rel['version'] . ' (' . $rel['state'] . ')';
-        print "A new version $vers of package $channel/$packageName is available \n";
+        $inst = $ppu->getInstalledRelease();
+        if (is_array($inst)) {
+            $rel = $ppu->getLatestRelease();
+            $vers = $rel['version'] . ' (' . $rel['state'] . ')';
+            print "A new version $vers of package $channel/$packageName is available \n";
 
-        // Update your local copy
-        $upd = $ppu->update();
+            // Update your local copy, only if package is already installed
+            $upd = $ppu->update();
+            if ($ppu->hasErrors()) {
+                $error = $ppu->popError();
+                echo "Error occured when trying to update: $channel/$packageName package\n";
+                echo "Message: " . $error['message'] ."\n";
+                echo "*** Context: ***\n";
+                echo "File: " . $error['context']['file'] ."\n";
+                echo "Line: " . $error['context']['line'] ."\n";
+                echo "Function: " . $error['context']['function'] ."\n";
+                echo "Class: " . $error['context']['class'] ."\n";
+                exit();
+            }
+        } else {
+            print "Package $channel/$packageName is not installed \n";
+        }
+
     }
 
     if (isset($upd) && $upd === true) {
@@ -38,17 +55,16 @@ if ($ppu !== false) {
     } else {
         $inst = $ppu->getInstalledRelease();
         if (is_array($inst)) {
-            //
             $vers = $inst['version'] . ' (' . $inst['state'] . ')';
             print "You are still using version $vers of package $channel/$packageName \n";
-            print "which depend on packages : \n";
-            foreach ($inst['deps'] as $dep) {
-                if ($dep['type'] === 'pkg') {
-                    print "- " . $dep['channel'] .'/'. $dep['name'] . "\n";
+            if (is_array($inst['deps'])) {
+                print "which depend on package(s) : \n";
+                foreach ($inst['deps'] as $dep) {
+                    if ($dep['type'] === 'pkg') {
+                        print "- " . $dep['channel'] .'/'. $dep['name'] . "\n";
+                    }
                 }
             }
-        } else {
-            print "Package $channel/$packageName is not installed \n";
         }
     }
 }
