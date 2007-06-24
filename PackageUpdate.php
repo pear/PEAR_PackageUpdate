@@ -355,6 +355,7 @@ class PEAR_PackageUpdate
     /**
      * Creates an instance of the given update class.
      *
+     * @static
      * @access public
      * @param  string $driver The type of PPU to create.
      * @param  string $packageName The package to update.
@@ -664,6 +665,7 @@ class PEAR_PackageUpdate
      * @since  0.4.0a1
      * @throws PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEACCESS,
      *         PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR
+     * @see    determinePrefFile()
      */
     function savePreferences($pref_file = '')
     {
@@ -721,6 +723,7 @@ class PEAR_PackageUpdate
      * @return boolean true if the preferences will allow an update for the
      *                 latest version.
      * @since  0.4.0a1
+     * @see    getPackagePreferences()
      */
     function preferencesAllowUpdate()
     {
