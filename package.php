@@ -49,6 +49,9 @@ $p2->setNotes('* bugs
   by giving file to read PEAR user-defined options from
   and/or file to read PEAR system-wide defaults from
 
+* news
+- add (missing) snapshot package state
+
 * changes
 - examples/CliFrontend.php script was changed a bit to prevent notice error if package is not installed
 - add myself (Laurent Laville) as co-author, in header comment blocks.

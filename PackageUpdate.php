@@ -33,10 +33,11 @@ define('PEAR_PACKAGEUPDATE_PREF_TYPE',        2);
 define('PEAR_PACKAGEUPDATE_PREF_STATE',       3);
 
 // Constants for states.
-define('PEAR_PACKAGEUPDATE_STATE_DEVEL',  'devel');
-define('PEAR_PACKAGEUPDATE_STATE_ALPHA',  'alpha');
-define('PEAR_PACKAGEUPDATE_STATE_BETA',   'beta');
-define('PEAR_PACKAGEUPDATE_STATE_STABLE', 'stable');
+define('PEAR_PACKAGEUPDATE_STATE_SNAPSHOT', 'snapshot');
+define('PEAR_PACKAGEUPDATE_STATE_DEVEL',    'devel');
+define('PEAR_PACKAGEUPDATE_STATE_ALPHA',    'alpha');
+define('PEAR_PACKAGEUPDATE_STATE_BETA',     'beta');
+define('PEAR_PACKAGEUPDATE_STATE_STABLE',   'stable');
 
 // Constants for release types.
 define('PEAR_PACKAGEUPDATE_TYPE_BUG',   'bug');
@@ -751,7 +752,8 @@ class PEAR_PackageUpdate
         // Check to see if the user has requested not to be asked about the
         // state of the latest release.
         // Create an array of states.
-        $states = array(PEAR_PACKAGEUPDATE_STATE_DEVEL  => 0,
+        $states = array(PEAR_PACKAGEUPDATE_STATE_SNAPSHOT => -1,
+                        PEAR_PACKAGEUPDATE_STATE_DEVEL  => 0,
                         PEAR_PACKAGEUPDATE_STATE_ALPHA  => 1,
                         PEAR_PACKAGEUPDATE_STATE_BETA   => 2,
                         PEAR_PACKAGEUPDATE_STATE_STABLE => 3
@@ -941,7 +943,8 @@ class PEAR_PackageUpdate
     function setMinimumState($minState)
     {
         // Make sure the type is acceptable.
-        if ($minState != PEAR_PACKAGEUPDATE_STATE_DEVEL  &&
+        if ($minState != PEAR_PACKAGEUPDATE_STATE_SNAPSHOT &&
+            $minState != PEAR_PACKAGEUPDATE_STATE_DEVEL  &&
             $minState != PEAR_PACKAGEUPDATE_STATE_ALPHA  &&
             $minState != PEAR_PACKAGEUPDATE_STATE_BETA   &&
             $minState != PEAR_PACKAGEUPDATE_STATE_STABLE
