@@ -1226,8 +1226,9 @@ class PEAR_PackageUpdate
      * way errors are handled varies greatly depending on the driver used.
      *
      * @access public
-     * @return object A PEAR_Error instance or false if no errors exist.
+     * @return mixed details of an error (array) or false if no errors exist.
      * @since  0.4.0a1
+     * @see    hasErrors()
      */
     function popError()
     {
@@ -1242,6 +1243,7 @@ class PEAR_PackageUpdate
      * @access public
      * @return boolean
      * @since  0.4.0a1
+     * @see    popError()
      */
     function hasErrors($level = false)
     {
