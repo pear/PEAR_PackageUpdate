@@ -37,11 +37,13 @@ if ($ppu !== false) {
                 $error = $ppu->popError();
                 echo "Error occured when trying to update: $channel/$packageName package\n";
                 echo "Message: " . $error['message'] ."\n";
-                echo "*** Context: ***\n";
-                echo "File: " . $error['context']['file'] ."\n";
-                echo "Line: " . $error['context']['line'] ."\n";
-                echo "Function: " . $error['context']['function'] ."\n";
-                echo "Class: " . $error['context']['class'] ."\n";
+                if (isset($error['context']) {
+                    echo "*** Context: ***\n";
+                    echo "File: " . $error['context']['file'] ."\n";
+                    echo "Line: " . $error['context']['line'] ."\n";
+                    echo "Function: " . $error['context']['function'] ."\n";
+                    echo "Class: " . $error['context']['class'] ."\n";
+                }
                 exit();
             }
         } else {

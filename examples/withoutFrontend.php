@@ -57,11 +57,13 @@ if ($ppu->hasErrors()) {
     $error = $ppu->popError();
     echo "<b>Error occured when trying to update: PEAR::Log package</b> <br />\n";
     echo "<b>Message:</b> " . $error['message'] ."<br />\n";
-    echo "<hr /><i>Context:</i><br />\n";
-    echo "<b>File:</b> " . $error['context']['file'] ."<br />\n";
-    echo "<b>Line:</b> " . $error['context']['line'] ."<br />\n";
-    echo "<b>Function:</b> " . $error['context']['function'] ."<br />\n";
-    echo "<b>Class:</b> " . $error['context']['class'] ."<br />\n";
+    if (isset($error['context']) {
+        echo "<hr /><i>Context:</i><br />\n";
+        echo "<b>File:</b> " . $error['context']['file'] ."<br />\n";
+        echo "<b>Line:</b> " . $error['context']['line'] ."<br />\n";
+        echo "<b>Function:</b> " . $error['context']['function'] ."<br />\n";
+        echo "<b>Class:</b> " . $error['context']['class'] ."<br />\n";
+    }
     exit();
 }
 
