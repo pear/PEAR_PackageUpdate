@@ -582,8 +582,17 @@ class PEAR_PackageUpdate
         // Create a config object.
         $config  =& PEAR_Config::singleton($this->user_file, $this->system_file);
 
+        if (empty($this->user_file)) {
+            if (empty($this->system_file)) {
+                $layer = null;
+            } else {
+                $layer = 'system';
+            }
+        } else {
+            $layer = 'user';
+        }
         // Get the config's registry object.
-        $reg = $config->getRegistry();
+        $reg = $config->getRegistry($layer);
 
         // Parse the package name.
         $parsed = $reg->parsePackageName($this->channel . '/' . $this->packageName);
