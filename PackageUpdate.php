@@ -605,8 +605,9 @@ class PEAR_PackageUpdate
 
         // Get a channel object.
         $chan =& $reg->getChannel($this->channel);
-        if ($chan->supportsREST($config->get('preferred_mirror')) &&
-            $base = $chan->getBaseURL('REST1.0', $config->get('preferred_mirror'))) {
+        $mirror = $config->get('preferred_mirror');
+        if ($chan->supportsREST($mirror) &&
+            $base = $chan->getBaseURL('REST1.0', $mirror)) {
 
             $rest =& $config->getREST('1.0', array());
             $info =  $rest->packageInfo($base, $parsed['package']);
