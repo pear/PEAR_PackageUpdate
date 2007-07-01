@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.5.0" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package packagerversion="1.6.1" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>PEAR_PackageUpdate</name>
  <channel>pear.php.net</channel>
  <summary>A simple way to update packages at run time.</summary>
@@ -20,10 +20,10 @@
   <email>pear@laurent-laville.org</email>
   <active>yes</active>
  </lead>
- <date>2007-02-13</date>
- <time>11:31:49</time>
+ <date>2007-07-01</date>
+ <time>08:46:47</time>
  <version>
-  <release>0.6.1</release>
+  <release>0.7.0</release>
   <api>1.0.0</api>
  </version>
  <stability>
@@ -32,11 +32,19 @@
  </stability>
  <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
  <notes>* bugs
-- fix bug #10080: PEAR_Config::singleton() should be able to be used in update()
+- fix bug #11384: Undefined variable
+  This solved also the problem to PEAR non standard installation,
+  by giving file to read PEAR user-defined options from
+  and/or file to read PEAR system-wide defaults from
+
+* news
+- add (missing) snapshot package state
 
 * changes
-- API stability was changed from beta to stable
-- examples/withoutFrontend.php script was changed a bit to clarify Doc bug #10079
+- examples/CliFrontend.php script was changed a bit to prevent notice error if package is not installed
+- add myself (Laurent Laville) as co-author, in header comment blocks.
+- add credit, in header comment blocks, to Ian Eure for his function (example)
+  to repackage PEAR_Errors for use with ErrorStack
  </notes>
  <contents>
   <dir baseinstalldir="PEAR" name="/">
@@ -87,6 +95,33 @@
  <changelog>
   <release>
    <version>
+    <release>0.7.0</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>stable</api>
+   </stability>
+   <date>2007-07-01</date>
+   <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
+   <notes>* bugs
+- fix bug #11384: Undefined variable
+  This solved also the problem to PEAR non standard installation,
+  by giving file to read PEAR user-defined options from
+  and/or file to read PEAR system-wide defaults from
+
+* news
+- add (missing) snapshot package state
+
+* changes
+- examples/CliFrontend.php script was changed a bit to prevent notice error if package is not installed
+- add myself (Laurent Laville) as co-author, in header comment blocks.
+- add credit, in header comment blocks, to Ian Eure for his function (example)
+  to repackage PEAR_Errors for use with ErrorStack
+   </notes>
+  </release>
+  <release>
+   <version>
     <release>0.6.1</release>
     <api>1.0.0</api>
    </version>
@@ -101,8 +136,7 @@
 
 * changes
 - API stability was changed from beta to stable
-- examples/withoutFrontend.php script was changed a bit to clarify Doc bug #10079
-   </notes>
+- examples/withoutFrontend.php script was changed a bit to clarify Doc bug #10079</notes>
   </release>
   <release>
    <version>
