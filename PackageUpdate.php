@@ -485,7 +485,7 @@ class PEAR_PackageUpdate
 
         // Make sure the contents were unserialized properly.
         // Borrowed from PEAR_Config.
-        if (!$preferences && strlen($contents) > 7) {
+        if ($preferences === false) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED);
             return false;
         }
