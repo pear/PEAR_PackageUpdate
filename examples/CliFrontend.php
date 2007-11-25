@@ -5,11 +5,15 @@
  * Present new features of PPU version 0.6.0 : get more details
  * on package installed and available
  *
- * @version    $Id$
- * @author     Laurent Laville <pear@laurent-laville.org>
- * @package    PEAR_PackageUpdate
- * @access     public
- * @since      File available since Release 0.6.0
+ * PHP versions 4 and 5
+ *
+ * @category PEAR
+ * @package  PEAR_PackageUpdate
+ * @author   Laurent Laville <pear@laurent-laville.org>
+ * @license  http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version  CVS: $Id$
+ * @link     http://pear.php.net/package/PEAR_PackageUpdate
+ * @since    File available since Release 0.6.0
  */
 
 require_once 'PEAR/PackageUpdate.php';
@@ -18,7 +22,8 @@ require_once 'PEAR/PackageUpdate.php';
 $channel     = 'pear';
 $packageName = 'Config';
 
-$ppu =& PEAR_PackageUpdate::factory('Cli', $packageName, $channel, 'c:\wamp\php\pear.ini', '', 'c:\wamp\php\ppurc.ini');
+$ppu =& PEAR_PackageUpdate::factory('Cli', $packageName, $channel,
+    'c:\wamp\php\pear.ini', '', 'c:\wamp\php\ppurc.ini');
 if ($ppu !== false) {
     $ppu->setMinimumState(PEAR_PACKAGEUPDATE_STATE_STABLE);
     $ppu->setMinimumReleaseType(PEAR_PACKAGEUPDATE_TYPE_BUG);
@@ -27,15 +32,17 @@ if ($ppu !== false) {
 
         $inst = $ppu->getInstalledRelease();
         if (is_array($inst)) {
-            $rel = $ppu->getLatestRelease();
+            $rel  = $ppu->getLatestRelease();
             $vers = $rel['version'] . ' (' . $rel['state'] . ')';
-            print "A new version $vers of package $channel/$packageName is available \n";
+            print "A new version $vers of package $channel/$packageName " .
+                "is available \n";
 
             // Update your local copy, only if package is already installed
             $upd = $ppu->update();
             if ($ppu->hasErrors()) {
                 $error = $ppu->popError();
-                echo "Error occured when trying to update: $channel/$packageName package\n";
+                echo "Error occured when trying to update: " .
+                    "$channel/$packageName package\n";
                 echo "Message: " . $error['message'] ."\n";
                 if (isset($error['context']) {
                     echo "*** Context: ***\n";
@@ -58,7 +65,8 @@ if ($ppu !== false) {
         $inst = $ppu->getInstalledRelease();
         if (is_array($inst)) {
             $vers = $inst['version'] . ' (' . $inst['state'] . ')';
-            print "You are still using version $vers of package $channel/$packageName \n";
+            print "You are still using version $vers of package " .
+                "$channel/$packageName \n";
             if (is_array($inst['deps'])) {
                 print "which depend on package(s) : \n";
                 foreach ($inst['deps'] as $dep) {
