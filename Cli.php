@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * This is the default CLI driver for PEAR_PackageUpdate.
  *
  * PHP versions 4 and 5
@@ -10,12 +10,13 @@
  * the PHP License and are unable to obtain it through the web, please
  * send a note to license@php.net so we can mail you a copy immediately.
  *
- * @category   PEAR
- * @package    PEAR_PackageUpdate
- * @author     Laurent Laville <pear@laurent-laville.org>
- * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id$
- * @since      File available since Release 0.6.0
+ * @category PEAR
+ * @package  PEAR_PackageUpdate
+ * @author   Laurent Laville <pear@laurent-laville.org>
+ * @license  http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version  CVS: $Id$
+ * @link     http://pear.php.net/package/PEAR_PackageUpdate
+ * @since    File available since Release 0.6.0
  */
 
 
@@ -45,25 +46,59 @@
  * ?>
  * </code>
  *
- * @category   PEAR
- * @package    PEAR_PackageUpdate
- * @author     Laurent Laville <pear@laurent-laville.org>
- * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    Release: @package_version@
- * @since      Class available since Release 0.6.0
+ * @category PEAR
+ * @package  PEAR_PackageUpdate
+ * @author   Laurent Laville <pear@laurent-laville.org>
+ * @license  http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version  Release: @package_version@
+ * @link     http://pear.php.net/package/PEAR_PackageUpdate
+ * @since    Class available since Release 0.6.0
  */
 
 class PEAR_PackageUpdate_Cli extends PEAR_PackageUpdate
 {
-    function PEAR_PackageUpdate_Cli($packageName, $channel, $user_file = '', $system_file = '', $pref_file = '')
+    /**
+     * Cli driver class constructor
+     *
+     * @param string $packageName The package to update.
+     * @param string $channel     The channel the package resides on.
+     * @param string $user_file   (optional) file to read PEAR user-defined
+     *                            options from
+     * @param string $system_file (optional) file to read PEAR system-wide
+     *                            defaults from
+     * @param string $pref_file   (optional) file to read PPU user-defined
+     *                            options from
+     *
+     * @access public
+     * @return void
+     * @since  0.6.0
+     */
+    function PEAR_PackageUpdate_Cli($packageName, $channel,
+        $user_file = '', $system_file = '', $pref_file = '')
     {
-        parent::PEAR_PackageUpdate($packageName, $channel, $user_file, $system_file, $pref_file);
+        parent::PEAR_PackageUpdate($packageName, $channel,
+            $user_file, $system_file, $pref_file);
     }
 
+    /**
+     * Cli driver does not redirects or exits
+     * to force the user to restart the application.
+     *
+     * @access public
+     * @return void
+     * @since  0.6.0
+     */
     function forceRestart()
     {
     }
 
+    /**
+     * Cli driver does not present any frontend when an update is needed
+     *
+     * @access public
+     * @return boolean Always true
+     * @since  0.6.0
+     */
     function presentUpdate()
     {
         // always update the package to latest version depending of options
