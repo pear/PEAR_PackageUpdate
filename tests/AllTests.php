@@ -10,14 +10,14 @@
  * the PHP License and are unable to obtain it through the web, please
  * send a note to license@php.net so we can mail you a copy immediately.
  *
- * @category   PEAR
- * @package    PEAR_PackageUpdate
- * @author     Laurent Laville <pear@laurent-laville.org>
- * @copyright  2007 Laurent Laville
- * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id$
- * @link       http://pear.php.net/package/PEAR_PackageUpdate
- * @since      File available since Release 1.0.0
+ * @category  PEAR
+ * @package   PEAR_PackageUpdate
+ * @author    Laurent Laville <pear@laurent-laville.org>
+ * @copyright 2007 Laurent Laville
+ * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version   CVS: $Id$
+ * @link      http://pear.php.net/package/PEAR_PackageUpdate
+ * @since     File available since Release 1.0.0
  */
 
 if (!defined('PHPUnit_MAIN_METHOD')) {
@@ -44,14 +44,14 @@ require_once 'PEAR_PackageUpdate_TestCase_DefaultConfig.php';
  * After the code coverage test browse the index.html file in tests/coverage.
  * The code coverage is close to 100%.
  *
- * @category   PEAR
- * @package    PEAR_PackageUpdate
- * @author     Laurent Laville <pear@laurent-laville.org>
- * @copyright  2007 Laurent Laville
- * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id$
- * @link       http://pear.php.net/package/PEAR_PackageUpdate
- * @since      Class available since Release 1.0.0
+ * @category  PEAR
+ * @package   PEAR_PackageUpdate
+ * @author    Laurent Laville <pear@laurent-laville.org>
+ * @copyright 2007 Laurent Laville
+ * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version   Release: $Id$
+ * @link      http://pear.php.net/package/PEAR_PackageUpdate
+ * @since     Class available since Release 1.0.0
  */
 
 class PEAR_PackageUpdate_AllTests
@@ -60,7 +60,6 @@ class PEAR_PackageUpdate_AllTests
      * Runs the test suite
      *
      * @return void
-     * @access public
      * @static
      * @since  1.0.0
      */
@@ -73,7 +72,6 @@ class PEAR_PackageUpdate_AllTests
      * Runs the test suite
      *
      * @return object the PHPUnit_Framework_TestSuite object
-     * @access public
      * @static
      * @since  1.0.0
      */
