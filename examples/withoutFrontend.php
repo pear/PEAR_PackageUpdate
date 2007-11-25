@@ -3,11 +3,15 @@
  * Always keep your application up-to-date with the most recent and stable version
  * of PEAR::Log package.
  *
- * @version    $Id$
- * @author     Laurent Laville <pear@laurent-laville.org>
- * @package    PEAR_PackageUpdate
- * @access     public
- * @since      File available since Release 0.5.0
+ * PHP versions 4 and 5
+ *
+ * @category PEAR
+ * @package  PEAR_PackageUpdate
+ * @author   Laurent Laville <pear@laurent-laville.org>
+ * @license  http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version  CVS: $Id$
+ * @link     http://pear.php.net/package/PEAR_PackageUpdate
+ * @since    File available since Release 0.5.0
  */
 
 require_once 'Log.php';
@@ -16,15 +20,42 @@ require_once 'PEAR/PackageUpdate.php';
 /**
  * This class allow to use PEAR_PackageUpdate as backend without any frontend.
  * No end-user action needed.
+ *
  * @ignore
  */
 class PEAR_PackageUpdate_Null extends PEAR_PackageUpdate
 {
-    function PEAR_PackageUpdate_Null($packageName, $channel, $user_file = '', $system_file = '', $pref_file = '')
+    /**
+     * Cli driver class constructor
+     *
+     * @param string $packageName The package to update.
+     * @param string $channel     The channel the package resides on.
+     * @param string $user_file   (optional) file to read PEAR user-defined
+     *                            options from
+     * @param string $system_file (optional) file to read PEAR system-wide
+     *                            defaults from
+     * @param string $pref_file   (optional) file to read PPU user-defined
+     *                            options from
+     *
+     * @access public
+     * @return void
+     * @since  0.5.0
+     */
+    function PEAR_PackageUpdate_Null($packageName, $channel,
+        $user_file = '', $system_file = '', $pref_file = '')
     {
-        parent::PEAR_PackageUpdate($packageName, $channel, $user_file, $system_file, $pref_file);
+        parent::PEAR_PackageUpdate($packageName, $channel,
+            $user_file, $system_file, $pref_file);
     }
 
+    /**
+     * Null driver always redirects to current script
+     * to force the user to restart the application.
+     *
+     * @access public
+     * @return void
+     * @since  0.5.0
+     */
     function forceRestart()
     {
         // removes warning message given by pear installer
