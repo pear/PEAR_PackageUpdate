@@ -11,53 +11,140 @@
  * the PHP License and are unable to obtain it through the web, please
  * send a note to license@php.net so we can mail you a copy immediately.
  *
- * @category   PEAR
- * @package    PEAR_PackageUpdate
- * @author     Scott Mattocks
- * @author     Laurent Laville
- * @author     Ian Eure (credits for repackage PEAR_Errors for use with ErrorStack)
- * @copyright  2006-2007 Scott Mattocks
- * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id$
- * @link       http://pear.php.net/package/PEAR_PackageUpdate
- * @since      File available since Release 0.4.0a1
+ * CREDITS: To Ian Eure <ieure@php.net>
+ *          for repackage PEAR_Errors for use with ErrorStack
+ *          see repackagePEARError()
+ *
+ * @category  PEAR
+ * @package   PEAR_PackageUpdate
+ * @author    Scott Mattocks <scottmattocks@php.net>
+ * @author    Laurent Laville <pear@laurent-laville.org>
+ * @copyright 2006-2007 Scott Mattocks
+ * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version   CVS: $Id$
+ * @link      http://pear.php.net/package/PEAR_PackageUpdate
+ * @since     File available since Release 0.4.0a1
  */
 
 require_once 'PEAR/ErrorStack.php';
 require_once 'PEAR/Config.php';
 
-// Constants for preferences.
-define('PEAR_PACKAGEUPDATE_PREF_NOUPDATES',   0);
+// PEAR_PACKAGEUPDATE_PREF_*  Constants for preferences.
+/**
+ * Check to see if the user wants to be notified about any updates for
+ * this package.
+ */
+define('PEAR_PACKAGEUPDATE_PREF_NOUPDATES', 0);
+/**
+ * Check to see if the user has requested not to be asked until a new
+ * version is released.
+ */
 define('PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE', 1);
-define('PEAR_PACKAGEUPDATE_PREF_TYPE',        2);
-define('PEAR_PACKAGEUPDATE_PREF_STATE',       3);
+/**
+ * Check to see if the user only wants to be asked about a certain
+ * type of release (bug|minor|major).
+ */
+define('PEAR_PACKAGEUPDATE_PREF_TYPE', 2);
+/**
+ * Check to see if the user has requested not to be asked about the
+ * state of the latest release.
+ */
+define('PEAR_PACKAGEUPDATE_PREF_STATE', 3);
 
-// Constants for states.
+// PEAR_PACKAGEUPDATE_STATE_*  Constants for states.
+/**
+ * Check to see if the user has requested to be asked when
+ * the latest release is a snapshot release.
+ */
 define('PEAR_PACKAGEUPDATE_STATE_SNAPSHOT', 'snapshot');
-define('PEAR_PACKAGEUPDATE_STATE_DEVEL',    'devel');
-define('PEAR_PACKAGEUPDATE_STATE_ALPHA',    'alpha');
-define('PEAR_PACKAGEUPDATE_STATE_BETA',     'beta');
-define('PEAR_PACKAGEUPDATE_STATE_STABLE',   'stable');
+/**
+ * Check to see if the user has requested to be asked when
+ * the latest release is a devel release.
+ */
+define('PEAR_PACKAGEUPDATE_STATE_DEVEL', 'devel');
+/**
+ * Check to see if the user has requested to be asked when
+ * the latest release is an alpha release.
+ */
+define('PEAR_PACKAGEUPDATE_STATE_ALPHA', 'alpha');
+/**
+ * Check to see if the user has requested to be asked when
+ * the latest release is an beta release.
+ */
+define('PEAR_PACKAGEUPDATE_STATE_BETA', 'beta');
+/**
+ * Check to see if the user has requested to be asked when
+ * the latest release is a stable release.
+ */
+define('PEAR_PACKAGEUPDATE_STATE_STABLE', 'stable');
 
-// Constants for release types.
-define('PEAR_PACKAGEUPDATE_TYPE_BUG',   'bug');
+// PEAR_PACKAGEUPDATE_TYPE_*  Constants for release types.
+/**
+ * Check to see if the user only wants to be asked about a bug release
+ */
+define('PEAR_PACKAGEUPDATE_TYPE_BUG', 'bug');
+/**
+ * Check to see if the user only wants to be asked about a minor release
+ */
 define('PEAR_PACKAGEUPDATE_TYPE_MINOR', 'minor');
+/**
+ * Check to see if the user only wants to be asked about a major release
+ */
 define('PEAR_PACKAGEUPDATE_TYPE_MAJOR', 'major');
 
-// Constants for errors.
-define('PEAR_PACKAGEUPDATE_ERROR_NOPACKAGE',            -1);
-define('PEAR_PACKAGEUPDATE_ERROR_NOCHANNEL',            -2);
-define('PEAR_PACKAGEUPDATE_ERROR_NOINFO',               -3);
-define('PEAR_PACKAGEUPDATE_ERROR_NOTINSTALLED',         -4);
-define('PEAR_PACKAGEUPDATE_ERROR_PREFFILE_READACCESS',  -5);
+// PEAR_PACKAGEUPDATE_ERROR_*  Constants for errors.
+/**
+ * No package name provided
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_NOPACKAGE', -1);
+/**
+ * No channel name provided
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_NOCHANNEL', -2);
+/**
+ * No update information is available for the package
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_NOINFO', -3);
+/**
+ * The package is not installed. It cannot be updated.
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_NOTINSTALLED', -4);
+/**
+ * Preferences cannot be read from file because of access permission errors
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_PREFFILE_READACCESS', -5);
+/**
+ * Preferences cannot be written to file because of access permission errors
+ */
 define('PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEACCESS', -6);
-define('PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR',  -7);
-define('PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED',   -8);
-define('PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE',          -9);
-define('PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE',         -10);
-define('PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF',          -11);
-define('PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER',    -12);
-define('PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE',       -13);
+/**
+ * An error occurred while trying to write the preferences to file
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR', -7);
+/**
+ * Preferences file is corrupted
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED', -8);
+/**
+ * Invalid release type
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE', -9);
+/**
+ * Invalid release state
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE', -10);
+/**
+ * Invalid preference identifier
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF', -11);
+/**
+* Driver (backend) could not be found.
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER', -12);
+/**
+ * Invalid INI file
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE', -13);
 
 // Error messages.
 $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
@@ -73,7 +160,8 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
         PEAR_PACKAGEUPDATE_ERROR_PREFFILE_READACCESS =>
             'Preferences cannot be read from %file%.',
         PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEACCESS =>
-            'Preferences cannot be written to %file% because of access permission errors.',
+            'Preferences cannot be written to %file% ' .
+            'because of access permission errors.',
         PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR =>
             'An error occurred while trying to write the preferences to %file%.',
         PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED =>
@@ -157,16 +245,15 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
  * ?>
  * </code>
  *
- * @category   PEAR
- * @package    PEAR_PackageUpdate
- * @author     Scott Mattocks
- * @author     Laurent Laville
- * @author     Ian Eure (credits for repackage PEAR_Errors for use with ErrorStack)
- * @copyright  2006-2007 Scott Mattocks
- * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    Release: @version@
- * @link       http://pear.php.net/package/PEAR_PackageUpdate
- * @since      Class available since Release 0.4.0a1
+ * @category  PEAR
+ * @package   PEAR_PackageUpdate
+ * @author    Scott Mattocks <scottmattocks@php.net>
+ * @author    Laurent Laville <pear@laurent-laville.org>
+ * @copyright 2006-2007 Scott Mattocks
+ * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version   Release: @version@
+ * @link      http://pear.php.net/package/PEAR_PackageUpdate
+ * @since     Class available since Release 0.4.0a1
  */
 
 class PEAR_PackageUpdate
@@ -274,34 +361,45 @@ class PEAR_PackageUpdate
     /**
      * PHP 4 style constructor. Calls the PHP 5 style constructor.
      *
+     * @param string $packageName The package to update.
+     * @param string $channel     The channel the package resides on.
+     * @param string $user_file   (optional) file to read PEAR user-defined
+     *                            options from
+     * @param string $system_file (optional) file to read PEAR system-wide
+     *                            defaults from
+     * @param string $pref_file   (optional) file to read PPU user-defined
+     *                            options from
+     *
      * @access public
-     * @param  string $packageName The package to update.
-     * @param  string $channel     The channel the package resides on.
-     * @param  string $user_file   (optional) file to read PEAR user-defined options from
-     * @param  string $system_file (optional) file to read PEAR system-wide defaults from
-     * @param  string $pref_file   (optional) file to read PPU user-defined options from
      * @return void
      * @since  0.4.0a1
      */
-    function PEAR_PackageUpdate($packageName, $channel, $user_file = '', $system_file = '', $pref_file = '')
+    function PEAR_PackageUpdate($packageName, $channel,
+        $user_file = '', $system_file = '', $pref_file = '')
     {
-        PEAR_PackageUpdate::__construct($packageName, $channel, $user_file, $system_file, $pref_file);
+        PEAR_PackageUpdate::__construct($packageName, $channel,
+            $user_file, $system_file, $pref_file);
     }
 
     /**
      * PHP 5 style constructor. Loads the user preferences.
      *
+     * @param string $packageName The package to update.
+     * @param string $channel     The channel the package resides on.
+     * @param string $user_file   (optional) file to read PEAR user-defined
+     *                            options from
+     * @param string $system_file (optional) file to read PEAR system-wide
+     *                            defaults from
+     * @param string $pref_file   (optional) file to read PPU user-defined
+     *                            options from
+     *
      * @access public
-     * @param  string $packageName The package to update.
-     * @param  string $channel     The channel the package resides on.
-     * @param  string $user_file   (optional) file to read PEAR user-defined options from
-     * @param  string $system_file (optional) file to read PEAR system-wide defaults from
-     * @param  string $pref_file   (optional) file to read PPU user-defined options from
      * @return void
      * @since  0.4.0a1
      * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE
      */
-    function __construct($packageName, $channel, $user_file = '', $system_file = '', $pref_file = '')
+    function __construct($packageName, $channel,
+        $user_file = '', $system_file = '', $pref_file = '')
     {
         // Create a pear error stack.
         $this->errors =& PEAR_ErrorStack::singleton(get_class($this));
@@ -313,22 +411,23 @@ class PEAR_PackageUpdate
 
         if ($user_file && !file_exists($user_file)) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE,
-                             'warning', array('layer' => 'pear-user', 'file' => $user_file)
-                             );
+                'warning',
+                array('layer' => 'pear-user', 'file' => $user_file));
             $user_file = ''; // force to use default user configuration
         }
         if ($system_file && !file_exists($system_file)) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE,
-                             'warning', array('layer' => 'pear-system', 'file' => $system_file)
-                             );
+                'warning',
+                array('layer' => 'pear-system', 'file' => $system_file));
             $system_file = ''; // force to use default system configuration
         }
+
         // Set the file to read PEAR user-defined options from
-        $this->user_file   = $user_file;
+        $this->user_file = $user_file;
         // Set the file to read PEAR system-wide defaults from
         $this->system_file = $system_file;
         // Set the file to read PPU user-defined options from
-        $this->pref_file   = $pref_file;
+        $this->pref_file = $pref_file;
 
         // Load the user's preferences.
         $this->loadPreferences($pref_file);
@@ -356,19 +455,24 @@ class PEAR_PackageUpdate
     /**
      * Creates an instance of the given update class.
      *
+     * @param string $driver      The type of PPU to create.
+     * @param string $packageName The package to update.
+     * @param string $channel     The channel the package resides on.
+     * @param string $user_file   (optional) file to read PEAR user-defined
+     *                            options from
+     * @param string $system_file (optional) file to read PEAR system-wide
+     *                            defaults from
+     * @param string $pref_file   (optional) file to read PPU user-defined
+     *                            options from
+     *
+     * @return object An instance of type PEAR_PackageUpdate_$driver
      * @static
      * @access public
-     * @param  string $driver The type of PPU to create.
-     * @param  string $packageName The package to update.
-     * @param  string $channel     The channel the package resides on.
-     * @param  string $user_file   (optional) file to read PEAR user-defined options from
-     * @param  string $system_file (optional) file to read PEAR system-wide defaults from
-     * @param  string $pref_file   (optional) file to read PPU user-defined options from
-     * @return object An instance of type PEAR_PackageUpdate_$driver
      * @since  0.4.0a1
      * @throws PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER
      */
-    function &factory($driver, $packageName, $channel, $user_file = '', $system_file = '', $pref_file = '')
+    function &factory($driver, $packageName, $channel,
+        $user_file = '', $system_file = '', $pref_file = '')
     {
         $class = 'PEAR_PackageUpdate_' . $driver;
 
@@ -382,11 +486,11 @@ class PEAR_PackageUpdate
 
             if (!PEAR_PackageUpdate::isIncludable($file)) {
                 PEAR_ErrorStack::staticPush('PEAR_PackageUpdate',
-                                            PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER,
-                                            null,
-                                            array('drivername' => $driver),
-                                            $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'][PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER]
-                                            );
+                    PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER,
+                    null,
+                    array('drivername' => $driver),
+                    $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS']
+                        [PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER]);
                 // Must assign a variable to avoid notice about references.
                 $false = false;
                 return $false;
@@ -402,16 +506,18 @@ class PEAR_PackageUpdate
         }
 
         // Try to instantiate the class.
-        $instance =& new $class($packageName, $channel, $user_file, $system_file, $pref_file);
+        $instance =& new $class($packageName, $channel,
+                       $user_file, $system_file, $pref_file);
         return $instance;
     }
 
     /**
      * Returns whether or not a path is in the include path.
      *
+     * @param string $path Path to filename to check if includable
+     *
      * @static
      * @access public
-     * @param  string  $path
      * @return boolean true if the path is in the include path.
      * @since  0.4.2
      */
@@ -419,8 +525,8 @@ class PEAR_PackageUpdate
     {
         // Break up the include path and check to see if the path is readable.
         foreach (explode(PATH_SEPARATOR, get_include_path()) as $ip) {
-            if (file_exists($ip . DIRECTORY_SEPARATOR . $path) &&
-                is_readable($ip . DIRECTORY_SEPARATOR . $path)
+            if (file_exists($ip . DIRECTORY_SEPARATOR . $path)
+                && is_readable($ip . DIRECTORY_SEPARATOR . $path)
                 ) {
                 return true;
             }
@@ -438,7 +544,8 @@ class PEAR_PackageUpdate
      * of preferences for each package that has been checked for
      * updates so far.
      *
-     * @param  string $pref_file   (optional) file to read PPU user-defined options from
+     * @param string $pref_file (optional) file to read PPU user-defined options from
+     *
      * @access protected
      * @return boolean   true on success, false on error
      * @since  0.4.0a1
@@ -450,8 +557,8 @@ class PEAR_PackageUpdate
     {
         if ($pref_file && !file_exists($pref_file)) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE,
-                             'warning', array('layer' => 'ppu-pref', 'file' => $pref_file)
-                             );
+                'warning',
+                array('layer' => 'ppu-pref', 'file' => $pref_file));
             $pref_file = ''; // force to use default PPU configuration
         }
 
@@ -472,8 +579,7 @@ class PEAR_PackageUpdate
         // Make sure the prefFile is readable.
         if (!@is_readable($prefFile)) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_PREFFILE_READACCESS,
-                             NULL, array('file' => $prefFile)
-                             );
+                null, array('file' => $prefFile));
             return false;
         }
 
@@ -491,7 +597,7 @@ class PEAR_PackageUpdate
         }
 
         $this->preferences = $preferences;
-        $this->pref_file = $prefFile;
+        $this->pref_file   = $prefFile;
 
         return true;
     }
@@ -580,7 +686,7 @@ class PEAR_PackageUpdate
         }
 
         // Create a config object.
-        $config  =& PEAR_Config::singleton($this->user_file, $this->system_file);
+        $config =& PEAR_Config::singleton($this->user_file, $this->system_file);
 
         if (empty($this->user_file)) {
             if (empty($this->system_file)) {
@@ -604,10 +710,10 @@ class PEAR_PackageUpdate
         }
 
         // Get a channel object.
-        $chan =& $reg->getChannel($this->channel);
+        $chan   =& $reg->getChannel($this->channel);
         $mirror = $config->get('preferred_mirror');
-        if ($chan->supportsREST($mirror) &&
-            $base = $chan->getBaseURL('REST1.0', $mirror)) {
+        if ($chan->supportsREST($mirror)
+            && $base = $chan->getBaseURL('REST1.0', $mirror)) {
 
             $rest =& $config->getREST('1.0', array());
             $info =  $rest->packageInfo($base, $parsed['package']);
@@ -618,14 +724,14 @@ class PEAR_PackageUpdate
 
         // Check to make sure the package was found.
         if (PEAR::isError($info) || !isset($info['name'])) {
-            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_NOINFO, NULL,
-                             array('packagename' => $this->packageName)
-                             );
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_NOINFO, null,
+                array('packagename' => $this->packageName));
             return false;
         }
 
         // Get full installed data of the package.
-        $this->instInfo = $reg->packageInfo($parsed['package'], null, $parsed['channel']);
+        $this->instInfo = $reg->packageInfo($parsed['package'], null,
+                              $parsed['channel']);
         if (is_null($this->instInfo)) {
             $this->instVersion = '';
         } else {
@@ -639,7 +745,8 @@ class PEAR_PackageUpdate
 
         // Pull out the latest information.
         $this->latestVersion = reset(array_keys($info['releases']));
-        $this->info          = reset($info['releases']);
+
+        $this->info                = reset($info['releases']);
         $this->info['version']     = $this->latestVersion;
         $this->info['summary']     = $info['summary'];
         $this->info['description'] = $info['description'];
@@ -672,7 +779,8 @@ class PEAR_PackageUpdate
     /**
      * Saves the current preferences to the RC file.
      *
-     * @param  string $pref_file   (optional) file to save PPU user-defined options to
+     * @param string $pref_file (optional) file to save PPU user-defined options to
+     *
      * @access public
      * @return boolean true on success, false on error
      * @since  0.4.0a1
@@ -693,8 +801,7 @@ class PEAR_PackageUpdate
         $fp = fopen($prefFile, 'w');
         if ($fp === false) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEACCESS,
-                             NULL, array('file' => $prefFile)
-                             );
+                null, array('file' => $prefFile));
             return false;
         }
 
@@ -704,16 +811,14 @@ class PEAR_PackageUpdate
         // Write the contents to the file.
         if (fwrite($fp, $serialCont) === false) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR,
-                             NULL, array('file' => $prefFile)
-                             );
+                null, array('file' => $prefFile));
             return false;
         }
 
         // Close the file.
         if (!fclose($fp)) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR,
-                             NULL, array('file' => $prefFile)
-                             );
+                null, array('file' => $prefFile));
             return false;
         } else {
             $this->pref_file = $prefFile;
@@ -745,16 +850,16 @@ class PEAR_PackageUpdate
 
         // Check to see if the user wants to be notified about any updates for
         // this package.
-        if (isset($prefs[PEAR_PACKAGEUPDATE_PREF_NOUPDATES]) &&
-            $prefs[PEAR_PACKAGEUPDATE_PREF_NOUPDATES]
+        if (isset($prefs[PEAR_PACKAGEUPDATE_PREF_NOUPDATES])
+            && $prefs[PEAR_PACKAGEUPDATE_PREF_NOUPDATES]
             ) {
             return false;
         }
 
         // Check to see if the user has requested not to be asked until a new
         // version is released.
-        if (isset($prefs[PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE]) &&
-            !version_compare($this->latestVersion,
+        if (isset($prefs[PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE])
+            && !version_compare($this->latestVersion,
                              $prefs[PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE],
                              '>')
             ) {
@@ -770,21 +875,23 @@ class PEAR_PackageUpdate
                         PEAR_PACKAGEUPDATE_STATE_BETA   => 2,
                         PEAR_PACKAGEUPDATE_STATE_STABLE => 3
                         );
-        if (isset($prefs[PEAR_PACKAGEUPDATE_PREF_STATE]) &&
-            $states[$prefs[PEAR_PACKAGEUPDATE_PREF_STATE]] > $states[$this->info['state']]
+        if (isset($prefs[PEAR_PACKAGEUPDATE_PREF_STATE])
+            && $states[$prefs[PEAR_PACKAGEUPDATE_PREF_STATE]] >
+                $states[$this->info['state']]
             ) {
             return false;
         }
 
         // Check to see if the user only wants to be asked about a certain
-        // type of release (minor|major).
+        // type of release (bug|minor|major).
         // Create an array for the types of releases.
         $releases = array(PEAR_PACKAGEUPDATE_TYPE_BUG   => 0,
                           PEAR_PACKAGEUPDATE_TYPE_MINOR => 1,
                           PEAR_PACKAGEUPDATE_TYPE_MAJOR => 2
                           );
-        if (isset($prefs[PEAR_PACKAGEUPDATE_PREF_TYPE]) &&
-            $releases[$prefs[PEAR_PACKAGEUPDATE_PREF_TYPE]] > $releases[$this->releaseType()]
+        if (isset($prefs[PEAR_PACKAGEUPDATE_PREF_TYPE])
+            && $releases[$prefs[PEAR_PACKAGEUPDATE_PREF_TYPE]] >
+                $releases[$this->releaseType()]
             ) {
             return false;
         }
@@ -834,7 +941,8 @@ class PEAR_PackageUpdate
         // compatibility for package.xml version 2.0
         if (isset($this->instInfo['old'])) {
             $instInfo = $this->instInfo['old'];
-            $instInfo['packagerversion'] = $this->instInfo['attribs']['packagerversion'];
+            $instInfo['packagerversion']
+                = $this->instInfo['attribs']['packagerversion'];
         } else {
             $instInfo = $this->instInfo;
         }
@@ -875,8 +983,9 @@ class PEAR_PackageUpdate
      * Sets the user's preference for asking about all updates for this
      * package.
      *
+     * @param boolean $dontAsk User's preference for asking about all updates
+     *
      * @access public
-     * @param  boolean $dontAsk
      * @return boolean true on success, false on failure
      * @since  0.4.0a1
      */
@@ -893,8 +1002,9 @@ class PEAR_PackageUpdate
      * Sets the user's preference for asking about updates again until the next
      * release.
      *
+     * @param boolean $nextrelease User's preference for asking about updates again
+     *
      * @access public
-     * @param  boolean $nextrelease
      * @return boolean true on success, false on failure
      * @since  0.4.0a1
      * @throws PEAR_PACKAGEUPDATE_ERROR_NOINFO
@@ -920,8 +1030,9 @@ class PEAR_PackageUpdate
     /**
      * Sets the user's preference for asking about release types.
      *
+     * @param string $minType The minimum release type to allow.
+     *
      * @access public
-     * @param  string  $minType The minimum release type to allow.
      * @return boolean true on success, false on failure
      * @since  0.4.0a1
      * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE
@@ -929,13 +1040,12 @@ class PEAR_PackageUpdate
     function setMinimumReleaseType($minType)
     {
         // Make sure the type is acceptable.
-        if ($minType != PEAR_PACKAGEUPDATE_TYPE_BUG   &&
-            $minType != PEAR_PACKAGEUPDATE_TYPE_MINOR &&
-            $minType != PEAR_PACKAGEUPDATE_TYPE_MAJOR
+        if ($minType != PEAR_PACKAGEUPDATE_TYPE_BUG
+            && $minType != PEAR_PACKAGEUPDATE_TYPE_MINOR²
+            && $minType != PEAR_PACKAGEUPDATE_TYPE_MAJOR
             ) {
-            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE, NULL,
-                             array('type' => $minType)
-                             );
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE, null,
+                array('type' => $minType));
             return false;
         }
 
@@ -946,8 +1056,9 @@ class PEAR_PackageUpdate
     /**
      * Sets the user's preference for asking about release states.
      *
+     * @param string $minState The minimum release state to allow.
+     *
      * @access public
-     * @param  string  $minState The minimum release state to allow.
      * @return boolean true on success, false on failure
      * @since  0.4.0a1
      * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE
@@ -955,15 +1066,14 @@ class PEAR_PackageUpdate
     function setMinimumState($minState)
     {
         // Make sure the type is acceptable.
-        if ($minState != PEAR_PACKAGEUPDATE_STATE_SNAPSHOT &&
-            $minState != PEAR_PACKAGEUPDATE_STATE_DEVEL  &&
-            $minState != PEAR_PACKAGEUPDATE_STATE_ALPHA  &&
-            $minState != PEAR_PACKAGEUPDATE_STATE_BETA   &&
-            $minState != PEAR_PACKAGEUPDATE_STATE_STABLE
+        if ($minState != PEAR_PACKAGEUPDATE_STATE_SNAPSHOT
+            && $minState != PEAR_PACKAGEUPDATE_STATE_DEVEL
+            && $minState != PEAR_PACKAGEUPDATE_STATE_ALPHA
+            && $minState != PEAR_PACKAGEUPDATE_STATE_BETA
+            && $minState != PEAR_PACKAGEUPDATE_STATE_STABLE
             ) {
-            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE, NULL,
-                             array('state' => $minState)
-                             );
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE, null,
+                array('state' => $minState));
             return false;
         }
 
@@ -977,25 +1087,25 @@ class PEAR_PackageUpdate
      * Don't take any chances. Anytime a preference is set, the preferences are
      * saved. We can't rely on the developer to call savePreferences.
      *
-     * @access protected
-     * @param  integer   $pref  One of the preference constants.
-     * @param  mixed     $value The value of the preference.
+     * @param integer $pref  One of the preference constants.
+     * @param mixed   $value The value of the preference.
+     *
      * @return boolean   true if the preference was set and saved properly.
+     * @access protected
      * @since  0.4.0a1
      * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF
      */
     function setPreference($pref, $value)
     {
         // Make sure the preference is valid.
-        if ($pref != PEAR_PACKAGEUPDATE_PREF_NOUPDATES   &&
-            $pref != PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE &&
-            $pref != PEAR_PACKAGEUPDATE_PREF_TYPE        &&
-            $pref != PEAR_PACKAGEUPDATE_PREF_STATE
+        if ($pref != PEAR_PACKAGEUPDATE_PREF_NOUPDATES
+            && $pref != PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE
+            && $pref != PEAR_PACKAGEUPDATE_PREF_TYPE
+            && $pref != PEAR_PACKAGEUPDATE_PREF_STATE
             ) {
             // Invalid preference!
-            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF, NULL,
-                             array('preference' => $pref)
-                             );
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF, null,
+                array('preference' => $pref));
             return false;
         }
 
@@ -1019,10 +1129,11 @@ class PEAR_PackageUpdate
     /**
      * Sets all preferences at once.
      *
-     * @access public
-     * @param  array   $preferences
+     * @param array $preferences All user's preferences
+     *
      * @return boolean true if the preferences were set and saved.
      * @since  0.4.0a1
+     * @access public
      */
     function setPreferences($preferences)
     {
@@ -1031,10 +1142,10 @@ class PEAR_PackageUpdate
 
         // Make sure there is only valid preference information.
         foreach ($preferences as $pref => $value) {
-            if ($pref != PEAR_PACKAGEUPDATE_PREF_NOUPDATES   &&
-                $pref != PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE &&
-                $pref != PEAR_PACKAGEUPDATE_PREF_TYPE        &&
-                $pref != PEAR_PACKAGEUPDATE_PREF_STATE
+            if ($pref != PEAR_PACKAGEUPDATE_PREF_NOUPDATES
+                && $pref != PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE
+                && $pref != PEAR_PACKAGEUPDATE_PREF_TYPE
+                && $pref != PEAR_PACKAGEUPDATE_PREF_STATE
                 ) {
                 unset($preferences[$pref]);
             }
@@ -1071,7 +1182,7 @@ class PEAR_PackageUpdate
     function update()
     {
         // Create a config object.
-        $config  =& PEAR_Config::singleton($this->user_file, $this->system_file);
+        $config =& PEAR_Config::singleton($this->user_file, $this->system_file);
 
         // Change the verbosity but keep track of the value to reset it just in
         // case this does something permanent.
@@ -1082,18 +1193,17 @@ class PEAR_PackageUpdate
         // If the current version is 0.0.0 don't upgrade. That would be a
         // sneaky way for devs to install packages without the use knowing.
         if ($this->instVersion == '0.0.0') {
-            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_NOTINSTALLED, NULL,
-                             array('packagename' => $this->packageName)
-                             );
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_NOTINSTALLED, null,
+                array('packagename' => $this->packageName));
             return false;
         }
 
-        require_once 'PEAR/Command.php';
+        include_once 'PEAR/Command.php';
         $upgrade = PEAR_Command::factory('upgrade', $config);
 
         // Try to upgrade the application.
         $channelPackage = $this->channel . '/' . $this->packageName;
-        $result = $upgrade->doInstall('upgrade',
+        $result         = $upgrade->doInstall('upgrade',
                                       array('onlyreqdeps' => true),
                                       array($channelPackage));
 
@@ -1120,7 +1230,7 @@ class PEAR_PackageUpdate
     function forceRestart()
     {
         $this->pushError('forceRestart is an abstract method that must be' .
-                         ' overridden in the child class.');
+            ' overridden in the child class.');
     }
 
     /**
@@ -1134,7 +1244,7 @@ class PEAR_PackageUpdate
     function presentUpdate()
     {
         $this->pushError('presentUpdate is an abstract method that must be' .
-                         ' overridden in the child class.');
+            ' overridden in the child class.');
 
         // Return false just in case something odd has happened.
         return false;
@@ -1148,7 +1258,6 @@ class PEAR_PackageUpdate
      * displaying all errors and handling them properly. This is because the
      * way errors are handled varies greatly depending on the driver used.
      *
-     * @access public
      * @param int    $code      Package-specific error code
      * @param string $level     Error level.  This is NOT spell-checked
      * @param array  $params    associative array of error parameters
@@ -1160,45 +1269,46 @@ class PEAR_PackageUpdate
      * @param array  $backtrace Protected parameter: use this to pass in the
      *                          {@link debug_backtrace()} that should be used
      *                          to find error context
+     *
      * @return PEAR_Error|array|Exception
      *                          if compatibility mode is on, a PEAR_Error is
      *                          also thrown.  If the class Exception exists,
      *                          then one is returned.
      * @since  0.4.0a1
+     * @access public
      */
     function pushError($code, $level = 'error', $params = array(),
                         $msg = false, $repackage = false, $backtrace = false)
     {
         // Check to see if a PEAR_Error was pushed.
         if (PEAR::isError($code)) {
-            return $this->repackagePEAR_Error($code);
+            return $this->repackagePEARError($code);
         }
 
         // Check the arguments to see if just a code was submitted.
-        if (is_int($code) &&
-            !(bool) $msg &&
-            isset($GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'][$code])
+        if (is_int($code)
+            && !(bool) $msg
+            && isset($GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'][$code])
             ) {
             $msg = $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'][$code];
         }
 
         // Append the error onto the stack.
         return $this->errors->push($code, $level, $params, $msg,
-                                   $repackage, $backtrace
-                                   );
+                                   $repackage, $backtrace);
     }
 
     /**
      * Repackages PEAR_Errors for use with ErrorStack.
      *
-     * @author Ian Eure
+     * @param object &$error A PEAR_Error
      *
-     * @access public
-     * @param  object $error A PEAR_Error
      * @return mixed  The return from PEAR::ErrorStack::push()
      * @since  0.4.0a1
+     * @access public
+     * @author Ian Eure <ieure@php.net>
      */
-    function repackagePEAR_Error(&$error)
+    function repackagePEARError(&$error)
     {
         static $map;
         if (!isset($map)) {
@@ -1225,8 +1335,7 @@ class PEAR_PackageUpdate
 
         return $this->errors->push($error->code, $map[$error->level],
                                    $error->userinfo, $error->message, false,
-                                   $error->backtrace
-                                   );
+                                   $error->backtrace);
     }
 
     /**
@@ -1250,8 +1359,10 @@ class PEAR_PackageUpdate
     /**
      * Returns whether or not errors have occurred (and been captured).
      *
-     * @param  string|array $level  Level name.  Use to determine if any errors
-     *                              of level (string), or levels (array) have been pushed
+     * @param string|array $level Level name. Use to determine if any errors
+     *                            of level (string), or levels (array)
+     *                            have been pushed
+     *
      * @access public
      * @return boolean
      * @since  0.4.0a1
