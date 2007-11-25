@@ -2,7 +2,10 @@
 /**
  * PEAR_PackageUpdate Package Script Generator
  *
- * Generate a new fresh version of package xml 2.0 built with PEAR_PackageFileManager 1.6.0+
+ * Generate a new fresh version of package xml 2.0
+ * built with PEAR_PackageFileManager 1.6.0+
+ *
+ * PHP versions 4 and 5
  *
  * LICENSE: This source file is subject to version 3.01 of the PHP license
  * that is available through the world-wide-web at the following URI:
@@ -10,14 +13,14 @@
  * the PHP License and are unable to obtain it through the web, please
  * send a note to license@php.net so we can mail you a copy immediately.
  *
- * @category   PEAR
- * @package    PEAR_PackageUpdate
- * @author     Laurent Laville <pear@laurent-laville.org>
- * @copyright  2007 The PHP Group
- * @license    http://www.php.net/license/3_01.txt  PHP License 3.01
- * @version    CVS: $Id$
- * @link       http://pear.php.net/package/PEAR_PackageUpdate
- * @since      File available since Release 0.6.0
+ * @category  PEAR
+ * @package   PEAR_PackageUpdate
+ * @author    Laurent Laville <pear@laurent-laville.org>
+ * @copyright 2007 The PHP Group
+ * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @version   CVS: $Id$
+ * @link      http://pear.php.net/package/PEAR_PackageUpdate
+ * @since     File available since Release 0.6.0
  * @ignore
  */
 
@@ -30,6 +33,7 @@ $packagefile = 'c:/php/pear/PEAR_PackageUpdate/package2.xml';
 $options = array('filelistgenerator' => 'cvs',
     'packagefile' => 'package2.xml',
     'baseinstalldir' => 'PEAR',
+    'addhiddenfiles' => true,
     'simpleoutput' => true,
     'clearcontents' => false,
     'changelogoldtonew' => false,
@@ -53,7 +57,8 @@ $p2->setNotes('* bugs
 - add (missing) snapshot package state
 
 * changes
-- examples/CliFrontend.php script was changed a bit to prevent notice error if package is not installed
+- examples/CliFrontend.php script was changed a bit to prevent notice error
+  if package is not installed
 - add myself (Laurent Laville) as co-author, in header comment blocks.
 - add credit, in header comment blocks, to Ian Eure for his function (example)
   to repackage PEAR_Errors for use with ErrorStack
@@ -61,7 +66,8 @@ $p2->setNotes('* bugs
 $p2->addInstallAs('Cli.php', 'PackageUpdate/Cli.php');
 $p2->generateContents();
 
-if (isset($_GET['make']) || (isset($_SERVER['argv']) && @$_SERVER['argv'][1] == 'make')) {
+if (isset($_GET['make'])
+    || (isset($_SERVER['argv']) && @$_SERVER['argv'][1] == 'make')) {
     $p2->writePackageFile();
 } else {
     $p2->debugPackageFile();
