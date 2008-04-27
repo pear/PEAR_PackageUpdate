@@ -607,15 +607,26 @@ class PEAR_PackageUpdate
      */
     function determinePrefFile()
     {
-        // Determine the preferences file.
-        // Borrowed from PEAR_Config
-
-        $ds = DIRECTORY_SEPARATOR;
         if (OS_WINDOWS) {
-            $prefFile = PEAR_CONFIG_SYSCONFDIR . $ds . 'ppurc.ini';
+            $cfgName = 'ppurc.ini';
         } else {
-            $prefFile = getenv('HOME') . $ds . '.ppurc';
+            $cfgName = '.ppurc';
         }
+
+        // PEAR 1.7.0 introduced new feature like configuration directory (cfg_dir)
+        $config =& PEAR_Config::singleton($this->user_file, $this->system_file);
+        $cfgDir = $config->get('cfg_dir');
+
+        if (!is_null($cfgDir) && is_dir($cfgDir)) {
+            // detect PEAR configuration directive (cfg_dir)
+        } else {
+            if (OS_WINDOWS) {
+                $cfgDir = PEAR_CONFIG_SYSCONFDIR;
+            } else {
+                $cfgDir = getenv('HOME');
+            }
+        }
+        $prefFile = $cfgDir . DIRECTORY_SEPARATOR . $cfgName;
 
         return $prefFile;
     }
