@@ -19,7 +19,7 @@
  * @package   PEAR_PackageUpdate
  * @author    Scott Mattocks <scottmattocks@php.net>
  * @author    Laurent Laville <pear@laurent-laville.org>
- * @copyright 2006-2007 Scott Mattocks
+ * @copyright 2006-2008 Scott Mattocks
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version   CVS: $Id$
  * @link      http://pear.php.net/package/PEAR_PackageUpdate
@@ -249,7 +249,7 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
  * @package   PEAR_PackageUpdate
  * @author    Scott Mattocks <scottmattocks@php.net>
  * @author    Laurent Laville <pear@laurent-laville.org>
- * @copyright 2006-2007 Scott Mattocks
+ * @copyright 2006-2008 Scott Mattocks
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version   Release: @version@
  * @link      http://pear.php.net/package/PEAR_PackageUpdate
@@ -372,7 +372,7 @@ class PEAR_PackageUpdate
      *
      * @access public
      * @return void
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      */
     function PEAR_PackageUpdate($packageName, $channel,
         $user_file = '', $system_file = '', $pref_file = '')
@@ -395,7 +395,7 @@ class PEAR_PackageUpdate
      *
      * @access public
      * @return void
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE
      */
     function __construct($packageName, $channel,
@@ -439,7 +439,7 @@ class PEAR_PackageUpdate
      *
      * @access private
      * @return mixed  backtrace context array or false is unavailable
-     * @since  0.4.3
+     * @since  version 0.4.3 (2006-04-25)
      */
     function _getBacktrace()
     {
@@ -468,7 +468,7 @@ class PEAR_PackageUpdate
      * @return object An instance of type PEAR_PackageUpdate_$driver
      * @static
      * @access public
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @throws PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER
      */
     function &factory($driver, $packageName, $channel,
@@ -519,7 +519,7 @@ class PEAR_PackageUpdate
      * @static
      * @access public
      * @return boolean true if the path is in the include path.
-     * @since  0.4.2
+     * @since  version 0.4.2 (2006-04-20)
      */
     function isIncludable($path)
     {
@@ -548,7 +548,7 @@ class PEAR_PackageUpdate
      *
      * @access protected
      * @return boolean   true on success, false on error
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @throws PEAR_PACKAGEUPDATE_ERROR_PREFFILE_READACCESS,
      *         PEAR_PACKAGEUPDATE_ERROR_PREFFILE_CORRUPTED,
      *         PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE
@@ -607,7 +607,7 @@ class PEAR_PackageUpdate
      *
      * @access protected
      * @return string
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      */
     function determinePrefFile()
     {
@@ -633,7 +633,7 @@ class PEAR_PackageUpdate
      *
      * @access public
      * @return boolean true if an update is available.
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      */
     function checkUpdate()
     {
@@ -662,7 +662,7 @@ class PEAR_PackageUpdate
      *
      * @access protected
      * @return boolean   true on success, false on error
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @throws PEAR_PACKAGEUPDATE_ERROR_NOPACKAGE,
      *         PEAR_PACKAGEUPDATE_ERROR_NOCHANNEL,
      *         PEAR_PACKAGEUPDATE_ERROR_NOINFO
@@ -765,7 +765,7 @@ class PEAR_PackageUpdate
      *
      * @access public
      * @return array
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      */
     function getPackagePreferences()
     {
@@ -783,7 +783,7 @@ class PEAR_PackageUpdate
      *
      * @access public
      * @return boolean true on success, false on error
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @throws PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEACCESS,
      *         PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR
      * @see    determinePrefFile()
@@ -840,7 +840,7 @@ class PEAR_PackageUpdate
      * @access public
      * @return boolean true if the preferences will allow an update for the
      *                 latest version.
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @see    getPackagePreferences()
      */
     function preferencesAllowUpdate()
@@ -906,7 +906,7 @@ class PEAR_PackageUpdate
      *
      * @access protected
      * @return string
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      */
     function releaseType()
     {
@@ -931,7 +931,7 @@ class PEAR_PackageUpdate
      * @author Laurent Laville
      * @access public
      * @return array|bool   false on error, data array otherwise
-     * @since  0.6.0
+     * @since  version 0.6.0 (2007-01-11)
      */
     function getInstalledRelease()
     {
@@ -967,7 +967,7 @@ class PEAR_PackageUpdate
      * @author Laurent Laville
      * @access public
      * @return array|bool   false on error, data array otherwise
-     * @since  0.6.0
+     * @since  version 0.6.0 (2007-01-11)
      */
     function getLatestRelease()
     {
@@ -987,7 +987,7 @@ class PEAR_PackageUpdate
      *
      * @access public
      * @return boolean true on success, false on failure
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      */
     function setDontAskAgain($dontAsk)
     {
@@ -1006,7 +1006,7 @@ class PEAR_PackageUpdate
      *
      * @access public
      * @return boolean true on success, false on failure
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @throws PEAR_PACKAGEUPDATE_ERROR_NOINFO
      */
     function setDontAskUntilNextRelease($nextrelease)
@@ -1034,7 +1034,7 @@ class PEAR_PackageUpdate
      *
      * @access public
      * @return boolean true on success, false on failure
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE
      */
     function setMinimumReleaseType($minType)
@@ -1060,7 +1060,7 @@ class PEAR_PackageUpdate
      *
      * @access public
      * @return boolean true on success, false on failure
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE
      */
     function setMinimumState($minState)
@@ -1092,7 +1092,7 @@ class PEAR_PackageUpdate
      *
      * @return boolean   true if the preference was set and saved properly.
      * @access protected
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF
      */
     function setPreference($pref, $value)
@@ -1132,7 +1132,7 @@ class PEAR_PackageUpdate
      * @param array $preferences All user's preferences
      *
      * @return boolean true if the preferences were set and saved.
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @access public
      */
     function setPreferences($preferences)
@@ -1176,7 +1176,7 @@ class PEAR_PackageUpdate
      *
      * @access public
      * @return boolean true if the update was successful.
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @throws PEAR_PACKAGEUPDATE_ERROR_NOTINSTALLED
      */
     function update()
@@ -1225,7 +1225,7 @@ class PEAR_PackageUpdate
      * @abstract
      * @access public
      * @return void
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      */
     function forceRestart()
     {
@@ -1239,7 +1239,7 @@ class PEAR_PackageUpdate
      * @abstract
      * @access public
      * @return boolean true if the user wants to update
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      */
     function presentUpdate()
     {
@@ -1274,7 +1274,7 @@ class PEAR_PackageUpdate
      *                          if compatibility mode is on, a PEAR_Error is
      *                          also thrown.  If the class Exception exists,
      *                          then one is returned.
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @access public
      */
     function pushError($code, $level = 'error', $params = array(),
@@ -1304,7 +1304,7 @@ class PEAR_PackageUpdate
      * @param object &$error A PEAR_Error
      *
      * @return mixed  The return from PEAR::ErrorStack::push()
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @access public
      * @author Ian Eure <ieure@php.net>
      */
@@ -1348,7 +1348,7 @@ class PEAR_PackageUpdate
      *
      * @access public
      * @return mixed details of an error (array) or false if no errors exist.
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @see    hasErrors()
      */
     function popError()
@@ -1365,7 +1365,7 @@ class PEAR_PackageUpdate
      *
      * @access public
      * @return boolean
-     * @since  0.4.0a1
+     * @since  version 0.4.0a1 (2006-03-28)
      * @see    popError()
      */
     function hasErrors($level = false)
