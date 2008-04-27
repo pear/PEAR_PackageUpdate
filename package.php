@@ -16,7 +16,7 @@
  * @category  PEAR
  * @package   PEAR_PackageUpdate
  * @author    Laurent Laville <pear@laurent-laville.org>
- * @copyright 2007 The PHP Group
+ * @copyright 2007-2008 The PHP Group
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version   CVS: $Id$
  * @link      http://pear.php.net/package/PEAR_PackageUpdate
@@ -37,34 +37,31 @@ $options = array('filelistgenerator' => 'cvs',
     'simpleoutput' => true,
     'clearcontents' => false,
     'changelogoldtonew' => false,
-    'ignore' => array('package.php')
+    'ignore' => array(__FILE__)
     );
 
 $p2 = &PEAR_PackageFileManager2::importOptions($packagefile, $options);
 $p2->setPackageType('php');
 $p2->addRelease();
-$p2->setReleaseVersion('0.7.0');
+$p2->setReleaseVersion('1.0.0');
 $p2->setAPIVersion('1.0.0');
-$p2->setReleaseStability('beta');
+$p2->setReleaseStability('stable');
 $p2->setAPIStability('stable');
-$p2->setNotes('* bugs
-- fix bug #11384: Undefined variable
-  This solved also the problem to PEAR non standard installation,
-  by giving file to read PEAR user-defined options from
-  and/or file to read PEAR system-wide defaults from
+$p2->setNotes('FINAL and first STABLE version after 9 month since last BETA release.
+No bug found !
 
 * news
-- add (missing) snapshot package state
+- default configuration file (.ppurc|ppurc.ini) is loaded/saved from/into PEAR
+configuration directory (PEAR 1.7.0+ cfg_dir directive)
 
-* changes
-- examples/CliFrontend.php script was changed a bit to prevent notice error
-  if package is not installed
-- add myself (Laurent Laville) as co-author, in header comment blocks.
-- add credit, in header comment blocks, to Ian Eure for his function (example)
-  to repackage PEAR_Errors for use with ErrorStack
+* QA
+- require now at least PEAR installer 1.5.4 rather than 1.4.8
+(security vulnerability fixes)
 ');
 $p2->addInstallAs('Cli.php', 'PackageUpdate/Cli.php');
 $p2->generateContents();
+
+$p2->setPearinstallerDep('1.5.4');
 
 if (isset($_GET['make'])
     || (isset($_SERVER['argv']) && @$_SERVER['argv'][1] == 'make')) {
