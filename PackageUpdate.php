@@ -443,12 +443,8 @@ class PEAR_PackageUpdate
      */
     function _getBacktrace()
     {
-        if (function_exists('debug_backtrace')) {
-            $backtrace = debug_backtrace();
-            $backtrace = $backtrace[count($backtrace)-1];
-        } else {
-            $backtrace = false;
-        }
+        $backtrace = debug_backtrace();
+        $backtrace = $backtrace[count($backtrace)-1];
         return $backtrace;
     }
 
