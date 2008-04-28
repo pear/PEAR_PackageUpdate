@@ -51,12 +51,18 @@ $p2->setNotes('FINAL and first STABLE version after 9 month since last BETA rele
 No bug found !
 
 * news
-- default configuration file (.ppurc|ppurc.ini) is loaded/saved from/into PEAR
-configuration directory (PEAR 1.7.0+ cfg_dir directive)
+- default configuration file (.ppurc|ppurc.ini) is loaded from and saved into PEAR
+configuration directory (PEAR 1.7.0+ cfg_dir directive) if available.
 
 * QA
 - require now at least PEAR installer 1.5.4 rather than 1.4.8
 (security vulnerability fixes)
+- Scott Mattocks is marked as inactive on his request, because he did not have
+time to give attention to this package it deserve. Thanks Scott for your past works
+on this package, and make this cool features a reality for the community.
+- Test Suite used now the .phpt test case rather than phpunit, just in case of a
+crash, and recovery of PEAR configuration (suggestion given by Christian Weiske
+already in same condition for PEAR_Info).
 ');
 $p2->addInstallAs('Cli.php', 'PackageUpdate/Cli.php');
 $p2->generateContents();
