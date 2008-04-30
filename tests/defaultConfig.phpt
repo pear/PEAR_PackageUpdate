@@ -2,27 +2,25 @@
 PEAR_PackageUpdate using default configuration
 --FILE--
 <?php
-require_once 'PEAR/Config.php';
-
-$config =& PEAR_Config::singleton();
-$cfgDir = $config->get('cfg_dir');  // available only since PEAR 1.7.0
-
 $ds         = DIRECTORY_SEPARATOR;
 $dir        = dirname(__FILE__);
 $sysconfdir = $dir . $ds . 'sysconf_dir';
 $peardir    = $dir . $ds . 'pear_dir';
+
+putenv("PHP_PEAR_SYSCONF_DIR=" . $sysconfdir);
+chdir($dir);
+
+// we get PEAR_PackageUpdate class only here due to setting of PEAR_CONFIG_SYSCONFDIR
+include_once 'PEAR/PackageUpdate.php';
+
+$config =& PEAR_Config::singleton();
+$cfgDir = $config->get('cfg_dir');  // available only since PEAR 1.7.0
 
 if (!is_null($cfgDir) && is_dir($cfgDir)) {
     $pearcfgdir = $peardir . $ds . 'cfg';
 } else {
     $pearcfgdir = $sysconfdir;
 }
-
-putenv("PHP_PEAR_SYSCONF_DIR=" . $sysconfdir);
-chdir($dir);
-
-// we get PEAR_PackageUpdate class only here due to setting of PEAR_CONFIG_SYSCONFDIR
-require_once 'PEAR/PackageUpdate.php';
 
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $system_file = $sysconfdir . $ds . 'pearsys.ini';
@@ -66,11 +64,6 @@ echo $testCase . ' checkUpdate : ' . $result;
 ?>
 --CLEAN--
 <?php
-require_once 'PEAR/Config.php';
-
-$config =& PEAR_Config::singleton();
-$cfgDir = $config->get('cfg_dir');  // available only since PEAR 1.7.0
-
 $ds         = DIRECTORY_SEPARATOR;
 $dir        = dirname(__FILE__);
 $sysconfdir = $dir . $ds . 'sysconf_dir';
