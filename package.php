@@ -68,6 +68,8 @@ $p2->addInstallAs('Cli.php', 'PackageUpdate/Cli.php');
 $p2->generateContents();
 
 $p2->setPearinstallerDep('1.5.4');
+$p2->updateMaintainer('lead', 'scottmattocks',
+                      'Scott Mattocks', 'scottmattocks@php.net', 'no');
 
 if (isset($_GET['make'])
     || (isset($_SERVER['argv']) && @$_SERVER['argv'][1] == 'make')) {

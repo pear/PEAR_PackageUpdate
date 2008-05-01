@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.6.1" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
+<package packagerversion="1.7.1" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0 http://pear.php.net/dtd/tasks-1.0.xsd http://pear.php.net/dtd/package-2.0 http://pear.php.net/dtd/package-2.0.xsd">
  <name>PEAR_PackageUpdate</name>
  <channel>pear.php.net</channel>
  <summary>A simple way to update packages at run time.</summary>
@@ -9,49 +9,88 @@
 
   PPU is just an engine for package updating. It should not be used directly. Instead one of the driver packages such as PEAR_PackageUpdate_Gtk2 should be used depending on the application or other package.</description>
  <lead>
-  <name>Scott Mattocks</name>
-  <user>scottmattocks</user>
-  <email>scottmattocks@php.net</email>
-  <active>yes</active>
- </lead>
- <lead>
   <name>Laurent Laville</name>
   <user>farell</user>
   <email>pear@laurent-laville.org</email>
   <active>yes</active>
  </lead>
- <date>2007-07-01</date>
- <time>08:46:47</time>
+ <lead>
+  <name>Scott Mattocks</name>
+  <user>scottmattocks</user>
+  <email>scottmattocks@php.net</email>
+  <active>no</active>
+ </lead>
+ <date>2008-05-01</date>
+ <time>10:06:48</time>
  <version>
-  <release>0.7.0</release>
+  <release>1.0.0</release>
   <api>1.0.0</api>
  </version>
  <stability>
-  <release>beta</release>
+  <release>stable</release>
   <api>stable</api>
  </stability>
  <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
- <notes>* bugs
-- fix bug #11384: Undefined variable
-  This solved also the problem to PEAR non standard installation,
-  by giving file to read PEAR user-defined options from
-  and/or file to read PEAR system-wide defaults from
+ <notes>FINAL and first STABLE version after 9 month since last BETA release.
+No bug found !
 
 * news
-- add (missing) snapshot package state
+- default configuration file (.ppurc|ppurc.ini) is loaded from and saved into PEAR
+configuration directory (PEAR 1.7.0+ cfg_dir directive) if available.
 
-* changes
-- examples/CliFrontend.php script was changed a bit to prevent notice error if package is not installed
-- add myself (Laurent Laville) as co-author, in header comment blocks.
-- add credit, in header comment blocks, to Ian Eure for his function (example)
-  to repackage PEAR_Errors for use with ErrorStack
+* QA
+- require now at least PEAR installer 1.5.4 rather than 1.4.8
+(security vulnerability fixes)
+- Scott Mattocks is marked as inactive on his request, because he did not have
+time to give attention to this package it deserve. Thanks Scott for your past works
+on this package, and make this cool features a reality for the community.
+- Test Suite used now the .phpt test case rather than phpunit, just in case of a
+crash, and recovery of PEAR configuration (suggestion given by Christian Weiske
+already in same condition for PEAR_Info).
  </notes>
  <contents>
   <dir baseinstalldir="PEAR" name="/">
    <dir name="examples">
     <file name="CliFrontend.php" role="doc" />
     <file name="withoutFrontend.php" role="doc" />
-   </dir> <!-- //examples -->
+   </dir> <!-- /examples -->
+   <dir name="tests">
+    <dir name="pear_dir">
+     <dir name=".channels">
+      <dir name=".alias">
+       <file name="pear.txt" role="test" />
+       <file name="pecl.txt" role="test" />
+       <file name="phpunit.txt" role="test" />
+      </dir> <!-- /tests/pear_dir/.channels/.alias -->
+      <file name="pear.php.net.reg" role="test" />
+      <file name="pear.phpunit.de.reg" role="test" />
+      <file name="pecl.php.net.reg" role="test" />
+      <file name="__uri.reg" role="test" />
+     </dir> <!-- /tests/pear_dir/.channels -->
+     <dir name=".registry">
+      <dir name=".channel.pear.phpunit.de">
+       <file name="phpunit.reg" role="test" />
+      </dir> <!-- /tests/pear_dir/.registry/.channel.pear.phpunit.de -->
+      <dir name=".channel.pecl.php.net">
+       <file name="empty_dir.txt" role="test" />
+      </dir> <!-- /tests/pear_dir/.registry/.channel.pecl.php.net -->
+      <dir name=".channel.__uri">
+       <file name="empty_dir.txt" role="test" />
+      </dir> <!-- /tests/pear_dir/.registry/.channel.__uri -->
+      <file name="console_getopt.reg" role="test" />
+      <file name="pear.reg" role="test" />
+      <file name="text_diff.reg" role="test" />
+     </dir> <!-- /tests/pear_dir/.registry -->
+     <dir name="cfg">
+      <file name="empty_dir.txt" role="test" />
+     </dir> <!-- /tests/pear_dir/cfg -->
+    </dir> <!-- /tests/pear_dir -->
+    <dir name="sysconf_dir">
+     <file name="empty_dir.txt" role="test" />
+    </dir> <!-- /tests/sysconf_dir -->
+    <file name="customConfig.phpt" role="test" />
+    <file name="defaultConfig.phpt" role="test" />
+   </dir> <!-- /tests -->
    <file name="Cli.php" role="php" />
    <file name="PackageUpdate.php" role="php">
     <tasks:replace from="@version@" to="version" type="package-info" />
@@ -64,13 +103,8 @@
     <min>4.3.0</min>
    </php>
    <pearinstaller>
-    <min>1.4.8</min>
+    <min>1.5.4</min>
    </pearinstaller>
-   <package>
-    <name>PEAR</name>
-    <channel>pear.php.net</channel>
-    <min>1.4.8</min>
-   </package>
   </required>
   <group hint="PHP-GTK 2 front end for PPU" name="gtk2">
    <package>
@@ -95,6 +129,35 @@
  <changelog>
   <release>
    <version>
+    <release>1.0.0</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2008-05-01</date>
+   <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
+   <notes>FINAL and first STABLE version after 9 month since last BETA release.
+No bug found !
+
+* news
+- default configuration file (.ppurc|ppurc.ini) is loaded from and saved into PEAR
+configuration directory (PEAR 1.7.0+ cfg_dir directive) if available.
+
+* QA
+- require now at least PEAR installer 1.5.4 rather than 1.4.8
+(security vulnerability fixes)
+- Scott Mattocks is marked as inactive on his request, because he did not have
+time to give attention to this package it deserve. Thanks Scott for your past works
+on this package, and make this cool features a reality for the community.
+- Test Suite used now the .phpt test case rather than phpunit, just in case of a
+crash, and recovery of PEAR configuration (suggestion given by Christian Weiske
+already in same condition for PEAR_Info).
+   </notes>
+  </release>
+  <release>
+   <version>
     <release>0.7.0</release>
     <api>1.0.0</api>
    </version>
@@ -117,8 +180,7 @@
 - examples/CliFrontend.php script was changed a bit to prevent notice error if package is not installed
 - add myself (Laurent Laville) as co-author, in header comment blocks.
 - add credit, in header comment blocks, to Ian Eure for his function (example)
-  to repackage PEAR_Errors for use with ErrorStack
-   </notes>
+  to repackage PEAR_Errors for use with ErrorStack</notes>
   </release>
   <release>
    <version>
