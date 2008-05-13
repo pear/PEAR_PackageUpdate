@@ -1048,7 +1048,7 @@ class PEAR_PackageUpdate
     {
         // Make sure the type is acceptable.
         if ($minType != PEAR_PACKAGEUPDATE_TYPE_BUG
-            && $minType != PEAR_PACKAGEUPDATE_TYPE_MINOR²
+            && $minType != PEAR_PACKAGEUPDATE_TYPE_MINOR
             && $minType != PEAR_PACKAGEUPDATE_TYPE_MAJOR
             ) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE, null,
