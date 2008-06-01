@@ -19,7 +19,7 @@
  * @package   PEAR_PackageUpdate
  * @author    Scott Mattocks <scottmattocks@php.net>
  * @author    Laurent Laville <pear@laurent-laville.org>
- * @copyright 2006-2008 Scott Mattocks, Laurent Laville
+ * @copyright 2006-2008 Scott Mattocks
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version   CVS: $Id$
  * @link      http://pear.php.net/package/PEAR_PackageUpdate
@@ -145,10 +145,6 @@ define('PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER', -12);
  * Invalid INI file
  */
 define('PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE', -13);
-/**
- * Protocol invalid or not supported
- */
-define('PEAR_PACKAGEUPDATE_ERROR_INVALIDPROTOCOL', -14);
 
 // Error messages.
 $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
@@ -179,9 +175,7 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
         PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER =>
             'Driver %drivername% could not be found.',
         PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE =>
-            'Invalid (%layer%) INI file : %file%',
-        PEAR_PACKAGEUPDATE_ERROR_INVALIDPROTOCOL =>
-            'Protocol %p% invalid or not supported',
+            'Invalid (%layer%) INI file : %file%'
     );
 
 /**
@@ -255,7 +249,7 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
  * @package   PEAR_PackageUpdate
  * @author    Scott Mattocks <scottmattocks@php.net>
  * @author    Laurent Laville <pear@laurent-laville.org>
- * @copyright 2006-2008 Scott Mattocks, Laurent Laville
+ * @copyright 2006-2008 Scott Mattocks
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version   Release: @version@
  * @link      http://pear.php.net/package/PEAR_PackageUpdate
@@ -365,38 +359,6 @@ class PEAR_PackageUpdate
     var $errors;
 
     /**
-     * Options configuration list
-     *
-     * - protocol
-     *    auto,    if you want to try REST protocol (version 1.0) first,
-     *             and only RPC in second try if REST fail (or is not supported)
-     *    RPC,     if you want only to contact server through the RPC protocol
-     *    RESTx.y, if you want to contact server through REST protocol
-     *             with the x.y version
-     * - server    name of the default channel server to contact
-     *             (without prefix http://)
-     *    auto,    if you want to contact the default pear channel server
-     *             or one of its mirror
-     *    (server) identify the address of the channel server to contact
-     *             Example: (server) == pear.phpunit.de
-     *
-     * @var    array
-     * @since  1.1.0
-     * @access public
-     * @see    __set(), __get()
-     */
-    var $options;
-
-    /**
-     * Message pattern about latest upgrade
-     *
-     * @since  1.1.0
-     * @access private
-     * @see    getUpgradeInfo()
-     */
-    var $_upgradeInfo;
-
-    /**
      * PHP 4 style constructor. Calls the PHP 5 style constructor.
      *
      * @param string $packageName The package to update.
@@ -439,10 +401,6 @@ class PEAR_PackageUpdate
     function __construct($packageName, $channel,
         $user_file = '', $system_file = '', $pref_file = '')
     {
-        // default options
-        $this->options = array('protocol' => 'auto',
-                               'server' => 'auto');
-
         // Create a pear error stack.
         $this->errors =& PEAR_ErrorStack::singleton(get_class($this));
         $this->errors->setContextCallback(array(&$this, '_getBacktrace'));
@@ -689,8 +647,6 @@ class PEAR_PackageUpdate
         // Check to see if an update is available.
         if (empty($this->latestVersion) || empty ($this->info)) {
             if (!$this->getInstalledRelease()) {
-                $this->_upgradeInfo
-                    = 'Package %channel%/%packageName% is not installed';
                 return false;
             }
         }
@@ -700,17 +656,10 @@ class PEAR_PackageUpdate
             // Check to see if the user's preferences allow an update.
             if (!$this->preferencesAllowUpdate()) {
                 // User doesn't want to update to the latest version.
-                $this->_upgradeInfo = 'You are still using version %oldvers%'
-                    . ' of package %channel%/%packageName%';
                 return false;
             }
-            $this->_upgradeInfo
-                = 'New version %newvers% of package %channel%/%packageName%'
-                . ' is available';
             return true;
         } else {
-            $this->_upgradeInfo = 'You are still using version %oldvers%'
-                . ' of package %channel%/%packageName%';
             return false;
         }
     }
@@ -724,7 +673,6 @@ class PEAR_PackageUpdate
      * @throws PEAR_PACKAGEUPDATE_ERROR_NOPACKAGE,
      *         PEAR_PACKAGEUPDATE_ERROR_NOCHANNEL,
      *         PEAR_PACKAGEUPDATE_ERROR_NOINFO
-     *         PEAR_PACKAGEUPDATE_ERROR_INVALIDPROTOCOL
      */
     function getPackageInfo()
     {
@@ -746,10 +694,22 @@ class PEAR_PackageUpdate
 
         // Create a config object.
         $config =& PEAR_Config::singleton($this->user_file, $this->system_file);
-        $reg    =& $this->_getRegistry();
+
+        if (empty($this->user_file)) {
+            if (empty($this->system_file)) {
+                $layer = null;
+            } else {
+                $layer = 'system';
+            }
+        } else {
+            $layer = 'user';
+        }
+        // Get the config's registry object.
+        $reg = $config->getRegistry($layer);
 
         // Parse the package name.
         $parsed = $reg->parsePackageName($this->channel . '/' . $this->packageName);
+
         // Check for errors.
         if (PEAR::isError($parsed)) {
             $this->pushError($parsed);
@@ -757,61 +717,17 @@ class PEAR_PackageUpdate
         }
 
         // Get a channel object.
-        $chan =& $reg->getChannel($this->channel);
-        // Check for errors.
-        if (PEAR::isError($chan)) {
-            $this->pushError($chan);
-            return false;
-        }
+        $chan   =& $reg->getChannel($this->channel);
+        $mirror = $config->get('preferred_mirror');
+        if ($chan->supportsREST($mirror)
+            && $base = $chan->getBaseURL('REST1.0', $mirror)) {
 
-        $cfg_server = $this->__get('server');
-        if ($cfg_server == 'auto') {
-            $mirror = $config->get('preferred_mirror');
-            if (is_null($mirror)) {
-                $mirror = $config->get('default_channel');
-            }
+            $rest =& $config->getREST('1.0', array());
+            $info =  $rest->packageInfo($base, $parsed['package']);
         } else {
-            $mirror = $cfg_server;
-        }
-
-        $cfg_protocol = $this->__get('protocol');
-        if ($cfg_protocol == 'auto') {
-            // try first with REST protocol,
-            // then if unavailable try with RPC protocol
-            if ($chan->supportsREST($mirror)
-                && $base = $chan->getBaseURL('REST1.0', $mirror)) {
-
-                $rest =& $config->getREST('1.0', array());
-                $info =  $rest->packageInfo($base, $parsed['package']);
-            } else {
-                $r    =& $config->getRemote();
-                $info =  $r->call('package.info', $parsed['package']);
-            }
-
-        } elseif($cfg_protocol == 'RPC') {
-            // RPC protocol only
             $r    =& $config->getRemote();
             $info =  $r->call('package.info', $parsed['package']);
-
-        } else {
-            // REST protocol (all versions)
-            if ($chan->supportsREST($mirror)
-                && $base = $chan->getBaseURL($cfg_protocol, $mirror)) {
-
-                $rest =& $config->getREST(substr($cfg_protocol, 4), array());
-                if (method_exists($rest, 'packageInfo')) {
-                    $info = $rest->packageInfo($base, $parsed['package']);
-                } else {
-                    $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDPROTOCOL, null,
-                        array('p' => $cfg_protocol));
-                    return false;
-                }
-            } else {
-                $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDPROTOCOL, null,
-                    array('p' => $cfg_protocol));
-                return false;
-            }
-        } //error_log(var_export($info, true));
+        }
 
         // Check to make sure the package was found.
         if (PEAR::isError($info) || !isset($info['name'])) {
@@ -1462,207 +1378,6 @@ class PEAR_PackageUpdate
     function hasErrors($level = false)
     {
         return $this->errors->hasErrors($level);
-    }
-
-    /**
-     * Return the registry object
-     *
-     * Return the user or system registry object
-     *
-     * @return object PEAR_Registry
-     * @since  version 1.1.0 (2008-06-01)
-     * @access private
-     */
-    function &_getRegistry()
-    {
-        // Create a config object.
-        $config =& PEAR_Config::singleton($this->user_file, $this->system_file);
-
-        if (empty($this->user_file)) {
-            if (empty($this->system_file)) {
-                $layer = null;
-            } else {
-                $layer = 'system';
-            }
-        } else {
-            $layer = 'user';
-        }
-        // Get the config's registry object.
-        $reg = $config->getRegistry($layer);
-        return $reg;
-    }
-
-    /**
-     * Set option for the class
-     *
-     * Set an individual option value. Option must exist.
-     *
-     * @param string $option Name of option to set
-     * @param string $val    Value of option to set
-     *
-     * @return void
-     * @since  version 1.1.0 (2008-06-01)
-     * @access public
-     */
-    function __set($option, $val)
-    {
-        if (isset($this->options[$option])) {
-            $this->options[$option] = $val;
-        }
-    }
-
-    /**
-     * Get option for the class
-     *
-     * Return current value of an individual option. If option does not exist,
-     * returns value is NULL.
-     *
-     * @param string $option Name of option to set
-     *
-     * @return mixed
-     * @since  version 1.1.0 (2008-06-01)
-     * @access public
-     */
-    function __get($option)
-    {
-        if (isset($this->options[$option])) {
-            $r = $this->options[$option];
-        } else {
-            $r = null;
-        }
-        return $r;
-    }
-
-    /**
-     * Return all options for the class
-     *
-     * Return all configuration options at once
-     *
-     * @return array
-     * @since  version 1.1.0 (2008-06-01)
-     * @access public
-     */
-    function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * Return an information message about latest upgrade
-     *
-     * Return a message about latest upgrade with information given by placeholders
-     *
-     * @param string $format  (optional) 'tpl' for template message pattern
-     *                                   'xml' for XML format
-     * @param mixed  $options (optional) additional information depending of $format
-     *
-     * @return string|null    Return null if format is unknown,
-     *                        message formatted with upgrade informations otherwise.
-     * @since  version 1.1.0 (2008-06-01)
-     * @access public
-     */
-    function getUpgradeInfo($format = 'tpl', $options = false)
-    {
-        $inst = $this->getInstalledRelease();
-
-        if (is_array($inst)) {
-            $oldvers = $inst['version'] . ' (' . $inst['state'] . ')';
-            $newvers = $this->latestVersion . ' (' . $this->info['state'] . ')';
-            // Message pattern replacements for :
-            // 'You are still using version %oldvers%
-            //      of package %channel%/%packageName%'
-            // or
-            // 'New version %newvers% of package %channel%/%packageName%
-            //      is available'
-            $message = str_replace(array('%oldvers%', '%newvers%',
-                                         '%channel%', '%packageName%'),
-                                   array($oldvers, $newvers,
-                                         $this->channel, $this->packageName),
-                                   $this->_upgradeInfo);
-        } else {
-            // Message pattern replacements:
-            // 'Package %channel%/%packageName% is not installed'
-            $message = str_replace(array('%channel%', '%packageName%'),
-                                   array($this->channel, $this->packageName),
-                                   $this->_upgradeInfo);
-        }
-
-        if ($format == 'tpl') {
-
-            $msg = $message;
-
-        } elseif ($format == 'xml') {
-            include_once 'XML/Util.php';
-
-            $version    = isset($options['version'])
-                        ? $options['version'] : '1.0';
-            $encoding   = isset($options['encoding'])
-                        ? $options['encoding'] : 'UTF-8';
-            $standalone = isset($options['standalone'])
-                        ? $options['standalone'] : null;
-
-            $reg  =& $this->_getRegistry();
-            $chan =& $reg->getChannel($this->channel);
-            $channelServer = $chan->getServer();
-
-
-            $msg  = XML_Util::getXMLDeclaration($version, $encoding, $standalone);
-            $msg .= PHP_EOL;
-            $msg .= XML_Util::createStartElement('ppu',
-                                           array('version' => '@package_version@'));
-            $msg .= PHP_EOL;
-            $attr = array('alias' => $this->channel);
-            $tag  = array('qname' => 'channel',
-                          'attributes' => $attr,
-                          'content' => $channelServer);
-            $msg .= XML_Util::createTagFromArray($tag);
-            $msg .= PHP_EOL;
-
-            $msg .= XML_Util::createStartElement('package');
-            $msg .= PHP_EOL;
-            $tag  = array('qname' => 'name',
-                          'attributes' => array(),
-                          'content' => $this->packageName);
-            $msg .= XML_Util::createTagFromArray($tag);
-            $msg .= PHP_EOL;
-
-            if (is_array($inst)) {
-                $attr = array('local' => $oldvers,
-                              'remote' => $newvers);
-                $tag  = array('qname' => 'versions',
-                              'attributes' => $attr,
-                              'content' => null);
-                $msg .= XML_Util::createTagFromArray($tag);
-                $msg .= PHP_EOL;
-            }
-
-            $msg .= XML_Util::createEndElement('package');
-            $msg .= PHP_EOL;
-            $tag  = array('qname' => 'message',
-                          'attributes' => array(),
-                          'content' => $message);
-            $msg .= XML_Util::createTagFromArray($tag);
-            $msg .= PHP_EOL;
-
-            $msg .= XML_Util::createEndElement('ppu');
-            $msg .= PHP_EOL;
-
-            // try to see if we can improve XML render
-            $beautifier = 'XML/Beautifier.php';
-            if (PEAR_PackageUpdate::isIncludable($beautifier)) {
-                include_once $beautifier;
-                $def    = array('indent' => ' ');
-                $others = isset($options['beautifier'])
-                        ? $options['beautifier'] : $def;
-                $opt    = array_merge($def, $others);
-                $fmt    = new XML_Beautifier($opt);
-                $msg    = $fmt->formatString($msg);
-            }
-
-        } else {
-            $msg = null;
-        }
-        return $msg;
     }
 }
 /*
