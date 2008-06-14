@@ -742,7 +742,11 @@ class PEAR_PackageUpdate
         if (is_null($this->instInfo)) {
             $this->instVersion = '';
         } else {
-            $this->instVersion = $this->instInfo['version']['release'];
+            if ($this->instInfo['xsdversion'] == '1.0') {
+                $this->instVersion = $this->instInfo['version'];
+            } else {
+                $this->instVersion = $this->instInfo['version']['release'];
+            }
         }
 
         // If the package is not installed, create a dummy version.
@@ -952,6 +956,9 @@ class PEAR_PackageUpdate
                 = $this->instInfo['attribs']['packagerversion'];
         } else {
             $instInfo = $this->instInfo;
+            if (!isset($instInfo['packagerversion'])) {
+                $instInfo['packagerversion'] = '';
+            }
         }
         $info = array(
             'version'         => $instInfo['version'],
