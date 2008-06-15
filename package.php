@@ -43,13 +43,14 @@ $options = array('filelistgenerator' => 'cvs',
 $p2 = &PEAR_PackageFileManager2::importOptions($packagefile, $options);
 $p2->setPackageType('php');
 $p2->addRelease();
-$p2->setReleaseVersion('1.0.1');
+$p2->setReleaseVersion('1.0.2');
 $p2->setAPIVersion('1.0.0');
 $p2->setReleaseStability('stable');
 $p2->setAPIStability('stable');
 $p2->setNotes('* bugs
-- a little typo error on constant name PEAR_PACKAGEUPDATE_TYPE_MINOR, that produce
-  an error if you use setMinimumReleaseType() method.
+- fix a display problem about current version installed (for web frontend)
+  when trying to upgrade a package still in xml 1.0 to a new version
+  in package xml 2.0. (Thanks to J&ouml;rg Wegner)
 ');
 $p2->addInstallAs('Cli.php', 'PackageUpdate/Cli.php');
 $p2->generateContents();
