@@ -69,8 +69,16 @@ $dir        = dirname(__FILE__);
 $sysconfdir = $dir . $ds . 'sysconf_dir';
 $peardir    = $dir . $ds . 'pear_dir';
 
+putenv("PHP_PEAR_SYSCONF_DIR=" . $sysconfdir);
+chdir($dir);
+
+include_once 'PEAR/Config.php';
+
+$config =& PEAR_Config::singleton();
+$cfgDir = $config->get('cfg_dir');  // available only since PEAR 1.7.0
+
 if (!is_null($cfgDir) && is_dir($cfgDir)) {
-    $pearcfgdir = $peardir . $ds . 'cfg';
+    $pearcfgdir = $cfgDir;
 } else {
     $pearcfgdir = $sysconfdir;
 }
