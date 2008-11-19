@@ -20,10 +20,10 @@
   <email>scottmattocks@php.net</email>
   <active>no</active>
  </lead>
- <date>2008-06-15</date>
- <time>16:07:08</time>
+ <date>2008-11-19</date>
+ <time>08:59:56</time>
  <version>
-  <release>1.0.2</release>
+  <release>1.0.3</release>
   <api>1.0.0</api>
  </version>
  <stability>
@@ -32,9 +32,7 @@
  </stability>
  <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
  <notes>* bugs
-- fix a display problem about current version installed (for web frontend)
-  when trying to upgrade a package still in xml 1.0 to a new version
-  in package xml 2.0. (Thanks to J&amp;ouml;rg Wegner)
+- fix cleanup phase of unit tests that raised notice errors
  </notes>
  <contents>
   <dir baseinstalldir="PEAR" name="/">
@@ -115,6 +113,21 @@
   </filelist>
  </phprelease>
  <changelog>
+  <release>
+   <version>
+    <release>1.0.3</release>
+    <api>1.0.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2008-11-19</date>
+   <license uri="http://www.php.net/license/3_01.txt">PHP License 3.01</license>
+   <notes>* bugs
+- fix cleanup phase of unit tests that raised notice errors
+   </notes>
+  </release>
   <release>
    <version>
     <release>1.0.2</release>
