@@ -44,7 +44,7 @@ if ($ppu !== false) {
                 echo "Error occured when trying to update: " .
                     "$channel/$packageName package\n";
                 echo "Message: " . $error['message'] ."\n";
-                if (isset($error['context']) {
+                if (isset($error['context'])) {
                     echo "*** Context: ***\n";
                     echo "File: " . $error['context']['file'] ."\n";
                     echo "Line: " . $error['context']['line'] ."\n";
