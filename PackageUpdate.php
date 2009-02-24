@@ -19,7 +19,7 @@
  * @package   PEAR_PackageUpdate
  * @author    Scott Mattocks <scottmattocks@php.net>
  * @author    Laurent Laville <pear@laurent-laville.org>
- * @copyright 2006-2008 Scott Mattocks
+ * @copyright 2006-2009 Scott Mattocks, Laurent Laville
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version   CVS: $Id$
  * @link      http://pear.php.net/package/PEAR_PackageUpdate
@@ -249,7 +249,7 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
  * @package   PEAR_PackageUpdate
  * @author    Scott Mattocks <scottmattocks@php.net>
  * @author    Laurent Laville <pear@laurent-laville.org>
- * @copyright 2006-2008 Scott Mattocks
+ * @copyright 2006-2009 Scott Mattocks, Laurent Laville
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version   Release: @version@
  * @link      http://pear.php.net/package/PEAR_PackageUpdate
@@ -583,7 +583,7 @@ class PEAR_PackageUpdate
         $contents = file_get_contents($prefFile);
 
         // Unserialize the data.
-        $preferences = unserialize($contents);
+        $preferences = @unserialize($contents);
 
         // Make sure the contents were unserialized properly.
         // Borrowed from PEAR_Config.
@@ -1387,10 +1387,4 @@ class PEAR_PackageUpdate
         return $this->errors->hasErrors($level);
     }
 }
-/*
- * Local variables:
- * tab-width: 4
- * c-basic-offset: 4
- * End:
- */
 ?>
