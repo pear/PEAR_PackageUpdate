@@ -91,38 +91,41 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
          save the remote REST resources to local cache
          */
         $lastmodified = time();
+        $packages     = array('text_diff', 'console_getopt');
 
-        // all releases for Text_Diff package
-        $contents = file_get_contents($restdir . $ds .
-                        'rest.cachefile.text_diff.allreleases.ser');
-        $releases = unserialize($contents);
-
-        // prepare cache file (+id) about each :
-        foreach ($releases['r'] as $r) {
-            // package info for version
+        foreach ($packages as $p) {
+            // all releases for Text_Diff package
             $contents = file_get_contents($restdir . $ds .
-                            'rest.cachefile.text_diff.'.$r['v'].'.ser');
+                            'rest.cachefile.'.$p.'.allreleases.ser');
+            $releases = unserialize($contents);
+
+            // prepare cache file (+id) about each :
+            foreach ($releases['r'] as $r) {
+                // package info for version
+                $contents = file_get_contents($restdir . $ds .
+                                'rest.cachefile.'.$p.'.'.$r['v'].'.ser');
+                $contents = unserialize($contents);
+                $url      = $baseurl . 'r/'.$p.'/'.$r['v'].'.xml';
+                $rest->saveCache($url, $contents, $lastmodified);
+
+                // depencencies for version
+                $contents = file_get_contents($restdir . $ds .
+                                'rest.cachefile.'.$p.'.deps.'.$r['v'].'.ser');
+                $contents = unserialize($contents);
+                $url      = $baseurl . 'r/'.$p.'/deps.'.$r['v'].'.txt';
+                $rest->saveCache($url, $contents, $lastmodified);
+            }
+            // general package information
+            $contents = file_get_contents($restdir . $ds .
+                            'rest.cachefile.'.$p.'.info.ser');
             $contents = unserialize($contents);
-            $url      = $baseurl . 'r/text_diff/'.$r['v'].'.xml';
+            $url      = $baseurl . 'p/'.$p.'/info.xml';
             $rest->saveCache($url, $contents, $lastmodified);
 
-            // depencencies for version
-            $contents = file_get_contents($restdir . $ds .
-                            'rest.cachefile.text_diff.deps.'.$r['v'].'.ser');
-            $contents = unserialize($contents);
-            $url      = $baseurl . 'r/text_diff/deps.'.$r['v'].'.txt';
-            $rest->saveCache($url, $contents, $lastmodified);
+            // all releases
+            $url      = $baseurl . 'r/'.$p.'/allreleases.xml';
+            $rest->saveCache($url, $releases, $lastmodified);
         }
-        // general package information
-        $contents = file_get_contents($restdir . $ds .
-                        'rest.cachefile.text_diff.info.ser');
-        $contents = unserialize($contents);
-        $url      = $baseurl . 'p/text_diff/info.xml';
-        $rest->saveCache($url, $contents, $lastmodified);
-
-        // all releases
-        $url      = $baseurl . 'r/text_diff/allreleases.xml';
-        $rest->saveCache($url, $releases, $lastmodified);
     }
 
     /**
@@ -157,9 +160,29 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests for checking if no update available for a package installed
+     * (in xml version 2.0)
+     *
+     * @return void
+     * @group  stub
+     */
+    public function testCheckUpdateNotAvailableForPackageXml2()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Console_Getopt', 'pear');
+
+        if ($ppu !== false) {
+            $r = ($ppu->checkUpdate() == false);
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
      * Tests to get the latest version available for a package on remote PEAR database
      *
      * @return void
+     * @group  stub
      */
     public function testGetLatestReleaseAvailable()
     {
