@@ -51,6 +51,12 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
     protected $sys_file;
 
     /**
+     * file to read package update options from
+     * @var string
+     */
+    protected $cfg_file;
+
+    /**
      * Sets up the fixture.
      * This method is called before a test is executed.
      *
@@ -62,6 +68,7 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
         $dir        = dirname(__FILE__);
         $sysconfdir = $dir . $ds . 'sysconf_dir';
         $peardir    = $dir . $ds . 'pear_dir';
+        $confdir    = $peardir . $ds . 'cfg';
         $cachedir   = $peardir . $ds . 'cache';
         $restdir    = $peardir . $ds . 'rest_resource';
         $baseurl    = 'http://pear.php.net/rest/';
@@ -72,12 +79,15 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $this->usr_file = $sysconfdir . $ds . 'pear.ini';
             $this->sys_file = $sysconfdir . $ds . 'pearsys.ini';
+            $this->cfg_file = $confdir    . $ds . 'ppurc.ini';
         } else {
             $this->usr_file = $sysconfdir . $ds . '.pearrc';
             $this->sys_file = $sysconfdir . $ds . 'pear.conf';
+            $this->cfg_file = $confdir    . $ds . '.ppurc';
         }
 
         $config =& PEAR_Config::singleton($this->usr_file, $this->sys_file);
+        $config->set('cfg_dir', $confdir);
         $config->set('php_dir', $peardir);
         $config->set('cache_dir', $cachedir);
         $config->set('cache_ttl', 3600);
@@ -138,6 +148,9 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
+        if (file_exists($this->cfg_file)) {
+            unlink($this->cfg_file);
+        }
         unlink($this->usr_file);
     }
 
@@ -181,6 +194,97 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests for checking if an update is available for a package installed
+     * and user does not want to upgrade
+     *
+     * @return void
+     * @group  stub
+     */
+    public function testCheckUpdateAvailableButUserRefuse()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear');
+        /*
+          even if an update is available, user does not want to upgrade
+          to any other version
+         */
+        $ppu->setDontAskAgain(true);
+
+        if ($ppu !== false) {
+            $r = ($ppu->checkUpdate() == false);
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests to install only newer version that follow a major release
+     *
+     * @return void
+     * @group  stub
+     */
+    public function testUpdateOnNextRelease()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear');
+
+        if ($ppu !== false) {
+            $r = $ppu->checkUpdate();
+            if ($r) {
+                $releaseInfo = $ppu->getLatestRelease();
+
+                if (version_compare($releaseInfo['version'], '1.1.0', 'eq')) {
+                    // user have an old version installed (0.2.1)
+                    // but want to wait for next release after 1.1.0
+                    $ppu->setDontAskUntilNextRelease(true);
+
+                    $r = ($ppu->checkUpdate() == false);
+                }
+            }
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests to install only newer and stable version
+     *
+     * @return void
+     * @group  stub
+     */
+    public function testUpdateOnlyStableVersion()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear');
+
+        if ($ppu !== false) {
+            $ppu->setMinimumState(PEAR_PACKAGEUPDATE_STATE_STABLE);
+            $r = $ppu->checkUpdate();
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests to install only newer and major version
+     *
+     * @return void
+     * @group  stub
+     */
+    public function testUpdateOnlyMajorVersion()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear');
+
+        if ($ppu !== false) {
+            $ppu->setMinimumReleaseType(PEAR_PACKAGEUPDATE_TYPE_MAJOR);
+            $r = $ppu->checkUpdate();
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
      * Tests to get the latest version available for a package on remote PEAR database
      *
      * @return void
@@ -193,7 +297,7 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
         if ($ppu !== false) {
             $r = $ppu->getLatestRelease();
             if ($r !== false) {
-                $this->assertSame($r['version'], '1.1.0');
+                $this->assertEquals($r['version'], '1.1.0');
                 return;
             }
         } else {

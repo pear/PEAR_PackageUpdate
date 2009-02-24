@@ -120,6 +120,7 @@ class PEAR_PackageUpdate_TestSuite_Exception extends PHPUnit_Framework_TestCase
      * when getting the latest release available
      *
      * @return void
+     * @group  exception
      */
     public function testGetLatestReleaseOnInvalidPackageName()
     {
@@ -127,7 +128,7 @@ class PEAR_PackageUpdate_TestSuite_Exception extends PHPUnit_Framework_TestCase
 
         if ($ppu !== false) {
             $ppu->getLatestRelease();
-            $r = $ppu->hasErrors('error');
+            $r = $ppu->hasErrors();
             if ($r = $r > 0) {
                 $e = $ppu->popError();
                 $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_NOPACKAGE, 'error');
@@ -143,6 +144,7 @@ class PEAR_PackageUpdate_TestSuite_Exception extends PHPUnit_Framework_TestCase
      * when getting the latest release available
      *
      * @return void
+     * @group  exception
      */
     public function testGetLatestReleaseOnInvalidChannelName()
     {
@@ -150,10 +152,82 @@ class PEAR_PackageUpdate_TestSuite_Exception extends PHPUnit_Framework_TestCase
 
         if ($ppu !== false) {
             $ppu->getLatestRelease();
-            $r = $ppu->hasErrors('error');
+            $r = $ppu->hasErrors();
             if ($r = $r > 0) {
                 $e = $ppu->popError();
                 $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_NOCHANNEL, 'error');
+            }
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests to catch exception for ask preference before getting package info
+     *
+     * @return void
+     * @group  exception
+     */
+    public function testEarlyDontAskUntilNextRelease()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear');
+
+        if ($ppu !== false) {
+            $ppu->setDontAskUntilNextRelease(true);
+
+            $r = $ppu->hasErrors();
+            if ($r = $r > 0) {
+                $e = $ppu->popError();
+                $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_NOINFO, 'error');
+            }
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests to catch exception for invalid minimum state
+     *
+     * @return void
+     * @group  exception
+     */
+    public function testInvalidMinimumState()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear');
+
+        if ($ppu !== false) {
+            $ppu->setMinimumState('cvs');
+
+            $r = $ppu->hasErrors();
+            if ($r = $r > 0) {
+                $e = $ppu->popError();
+                $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE, 'error');
+            }
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests to catch exception for invalid release type
+     *
+     * @return void
+     * @group  exception
+     */
+    public function testInvalidReleaseType()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear');
+
+        if ($ppu !== false) {
+            $ppu->setMinimumReleaseType('cvs');
+
+            $r = $ppu->hasErrors();
+            if ($r = $r > 0) {
+                $e = $ppu->popError();
+                $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE, 'error');
             }
         } else {
             $r = $ppu;
