@@ -64,7 +64,7 @@ class PEAR_PackageUpdate_AllTests
      *
      * @return void
      * @static
-     * @since  1.7.0
+     * @since  1.1.0
      */
     public static function main()
     {
@@ -76,7 +76,7 @@ class PEAR_PackageUpdate_AllTests
      *
      * @return object the PHPUnit_Framework_TestSuite object
      * @static
-     * @since  1.7.0
+     * @since  1.1.0
      */
     public static function suite()
     {
