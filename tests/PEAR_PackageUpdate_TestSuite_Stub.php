@@ -86,15 +86,17 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
         $rest = new PEAR_REST($config);
 
         /*
-         To suggest an update available for installed package (xml 1.0)
-         Text_Diff version 0.2.1
-         save the remote REST resources to local cache
+         Save the remote REST resources to local cache :
+         - to suggest an update available for installed package (xml 1.0)
+           Text_Diff version 0.2.1
+         - to suggest no update available for installed package (xml 2.0)
+           Console_Getopt version 1.2.3
          */
         $lastmodified = time();
         $packages     = array('text_diff', 'console_getopt');
 
         foreach ($packages as $p) {
-            // all releases for Text_Diff package
+            // all releases for package
             $contents = file_get_contents($restdir . $ds .
                             'rest.cachefile.'.$p.'.allreleases.ser');
             $releases = unserialize($contents);
