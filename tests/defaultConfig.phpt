@@ -56,11 +56,6 @@ $result = ($ppu !== false)
     ? 'OK' : 'System or Preference configuration file does not exist';
 
 echo $testCase . ' initClass : ' . $result;
-echo "\n";
-
-$result = ($ppu->checkUpdate() === true)
-    ? 'OK' : 'No update available for PEAR/Text_Diff';
-echo $testCase . ' checkUpdate : ' . $result;
 ?>
 --CLEAN--
 <?php
@@ -96,4 +91,3 @@ unlink ($pref_file);
 ?>
 --EXPECT--
 testConfigFilesExistInSysConfDir initClass : OK
-testConfigFilesExistInSysConfDir checkUpdate : OK
