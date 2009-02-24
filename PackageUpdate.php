@@ -575,7 +575,7 @@ class PEAR_PackageUpdate
         // Make sure the prefFile is readable.
         if (!@is_readable($prefFile)) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_PREFFILE_READACCESS,
-                null, array('file' => $prefFile));
+                'error', array('file' => $prefFile));
             return false;
         }
 
@@ -731,7 +731,7 @@ class PEAR_PackageUpdate
 
         // Check to make sure the package was found.
         if (PEAR::isError($info) || !isset($info['name'])) {
-            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_NOINFO, null,
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_NOINFO, 'error',
                 array('packagename' => $this->packageName));
             return false;
         }
@@ -812,7 +812,7 @@ class PEAR_PackageUpdate
         $fp = fopen($prefFile, 'w');
         if ($fp === false) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEACCESS,
-                null, array('file' => $prefFile));
+                'error', array('file' => $prefFile));
             return false;
         }
 
@@ -822,14 +822,14 @@ class PEAR_PackageUpdate
         // Write the contents to the file.
         if (fwrite($fp, $serialCont) === false) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR,
-                null, array('file' => $prefFile));
+                'error', array('file' => $prefFile));
             return false;
         }
 
         // Close the file.
         if (!fclose($fp)) {
             $this->pushError(PEAR_PACKAGEUPDATE_ERROR_PREFFILE_WRITEERROR,
-                null, array('file' => $prefFile));
+                'error', array('file' => $prefFile));
             return false;
         } else {
             $this->pref_file = $prefFile;
@@ -1058,7 +1058,7 @@ class PEAR_PackageUpdate
             && $minType != PEAR_PACKAGEUPDATE_TYPE_MINOR
             && $minType != PEAR_PACKAGEUPDATE_TYPE_MAJOR
             ) {
-            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE, null,
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE, 'error',
                 array('type' => $minType));
             return false;
         }
@@ -1086,7 +1086,7 @@ class PEAR_PackageUpdate
             && $minState != PEAR_PACKAGEUPDATE_STATE_BETA
             && $minState != PEAR_PACKAGEUPDATE_STATE_STABLE
             ) {
-            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE, null,
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDSTATE, 'error',
                 array('state' => $minState));
             return false;
         }
@@ -1118,7 +1118,7 @@ class PEAR_PackageUpdate
             && $pref != PEAR_PACKAGEUPDATE_PREF_STATE
             ) {
             // Invalid preference!
-            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF, null,
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDPREF, 'error',
                 array('preference' => $pref));
             return false;
         }
@@ -1207,7 +1207,7 @@ class PEAR_PackageUpdate
         // If the current version is 0.0.0 don't upgrade. That would be a
         // sneaky way for devs to install packages without the use knowing.
         if ($this->instVersion == '0.0.0') {
-            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_NOTINSTALLED, null,
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_NOTINSTALLED, 'error',
                 array('packagename' => $this->packageName));
             return false;
         }
