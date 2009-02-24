@@ -2,8 +2,6 @@
 PEAR_PackageUpdate using custom configuration
 --FILE--
 <?php
-error_reporting(E_ALL & ~E_NOTICE);
-
 $ds         = DIRECTORY_SEPARATOR;
 $dir        = dirname(__FILE__);
 $sysconfdir = $dir . $ds . 'sysconf_dir';
@@ -11,6 +9,7 @@ $peardir    = $dir . $ds . 'pear_dir';
 
 putenv("PHP_PEAR_SYSCONF_DIR=" . $sysconfdir);
 chdir($dir);
+set_include_path($peardir . PATH_SEPARATOR . get_include_path());
 
 // we get PEAR_PackageUpdate class only here due to setting of PEAR_CONFIG_SYSCONFDIR
 include_once 'PEAR/PackageUpdate.php';
@@ -61,6 +60,52 @@ echo "\n";
 
 /**
  * TestCase 2:
+ * Test invalid driver name (class name is not corresponding to path file)
+ *
+ * Will use the pear config files into the default system directory
+ * (PEAR_CONFIG_SYSCONFDIR).
+ */
+$testCase = 'testWrongDriverClass';
+
+$ppu =& PEAR_PackageUpdate::factory('Foo', 'Text_Diff', 'pear');
+
+$result = ($ppu === false) ? 'KO' : 'OK';
+
+echo $testCase . ' initClass : ' . $result;
+echo "\n";
+
+/**
+ * TestCase 3:
+ * Test config files that does not exist
+ */
+$testCase = 'testWarningConfigFiles';
+
+$ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear',
+                                    $user_file . '.wrong', $system_file . '.wrong');
+
+$result = 'KO';
+
+if ($ppu !== false && $ppu->hasErrors()) {
+    $e = $ppu->popError();
+    if ($e['code'] == PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE &&
+        strpos($e['message'], 'pear-system') > 0
+    ) {
+        $result = 'System configuration file provided does not exist';
+    }
+    if ($ppu->hasErrors()) {
+        $e = $ppu->popError();
+        if ($e['code'] == PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE &&
+            strpos($e['message'], 'pear-user') > 0
+        ) {
+            $result = 'All configuration files provided does not exist';
+        }
+    }
+}
+echo $testCase . ' initClass : ' . $result;
+echo "\n";
+
+/**
+ * TestCase 4:
  * Test a preference PPU file that does not exist
  *
  * Must use the pear config files into the default system directory
@@ -75,20 +120,17 @@ $result = '??';
 
 if ($ppu !== false && $ppu->hasErrors()) {
     $e = $ppu->popError();
-    if ($e['code'] == PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE) {
+    if ($e['code'] == PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE &&
+        strpos($e['message'], 'ppu-pref') > 0
+    ) {
         $result = 'Preference configuration file does not exist';
     }
 }
 echo $testCase . ' initClass : ' . $result;
 echo "\n";
 
-$result = ($ppu->checkUpdate() === true)
-    ? 'OK' : 'No update available for PEAR/Text_Diff';
-echo $testCase . ' checkUpdate : ' . $result;
-echo "\n";
-
 /**
- * TestCase 3:
+ * TestCase 5:
  * Test a corrupted preference PPU file (wrong content)
  *
  * Will use the pear config files into the default system directory
@@ -111,11 +153,6 @@ if ($ppu !== false && $ppu->hasErrors()) {
     }
 }
 echo $testCase . ' initClass : ' . $result;
-echo "\n";
-
-$result = ($ppu->checkUpdate() === true)
-    ? 'OK' : 'No update available for PEAR/Text_Diff';
-echo $testCase . ' checkUpdate : ' . $result;
 ?>
 --CLEAN--
 <?php
@@ -153,7 +190,7 @@ unlink ($bad_pref_file);
 ?>
 --EXPECT--
 testWrongDriver initClass : KO
+testWrongDriverClass initClass : KO
+testWarningConfigFiles initClass : All configuration files provided does not exist
 testWrongPrefFile initClass : Preference configuration file does not exist
-testWrongPrefFile checkUpdate : OK
 testCorruptedPrefFile initClass : Preference configuration file is corrupted
-testCorruptedPrefFile checkUpdate : OK
