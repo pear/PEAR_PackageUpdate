@@ -74,6 +74,8 @@ class PEAR_PackageUpdate_TestSuite_Exception extends PHPUnit_Framework_TestCase
             $this->sys_file = $sysconfdir . $ds . 'pear.conf';
         }
 
+        set_include_path($peardir . PATH_SEPARATOR . get_include_path());
+
         putenv("PHP_PEAR_SYSCONF_DIR=" . $sysconfdir);
         include_once 'PEAR/PackageUpdate.php';
 
@@ -98,13 +100,14 @@ class PEAR_PackageUpdate_TestSuite_Exception extends PHPUnit_Framework_TestCase
     /**
      * tests API throws error
      *
-     * @param array  $error PEAR_ErrorStack stack entry
-     * @param int    $code  error code
-     * @param string $level error level (exception or error)
+     * @param array  $error   PEAR_ErrorStack stack entry
+     * @param int    $code    error code
+     * @param string $level   error level (exception or error)
+     * @param string $message part of error message to check
      *
      * @return void
      */
-    public function catchError($error, $code = null, $level = null)
+    public function catchError($error, $code = null, $level = null, $message = null)
     {
         $this->assertType(PHPUnit_Framework_Constraint_IsType::TYPE_ARRAY, $error);
         if (isset($code)) {
@@ -112,6 +115,9 @@ class PEAR_PackageUpdate_TestSuite_Exception extends PHPUnit_Framework_TestCase
         }
         if (isset($level)) {
             $this->assertEquals($error['level'], $level);
+        }
+        if (isset($message)) {
+            $this->assertRegExp('/'.$message.'/', $error['message']);
         }
     }
 
@@ -228,6 +234,58 @@ class PEAR_PackageUpdate_TestSuite_Exception extends PHPUnit_Framework_TestCase
             if ($r = $r > 0) {
                 $e = $ppu->popError();
                 $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_INVALIDTYPE, 'error');
+            }
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests to catch exception for invalid driver structure
+     * without presentUpdate() method
+     *
+     * @return void
+     * @group  exception
+     */
+    public function testInvalidDriverWithoutPresentUpdate()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Foo2', 'Text_Diff', 'pear');
+
+        if ($ppu !== false) {
+            $r = $ppu->presentUpdate();
+
+            $r = $ppu->hasErrors();
+            if ($r = $r > 0) {
+                $e = $ppu->popError();
+                $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_INVALIDDRIVER,
+                                  'exception', 'abstract method');
+            }
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests to catch exception for invalid driver structure
+     * without forceRestart() method
+     *
+     * @return void
+     * @group  exception
+     */
+    public function testInvalidDriverWithoutForceRestart()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Foo2', 'Text_Diff', 'pear');
+
+        if ($ppu !== false) {
+            $r = $ppu->forceRestart();
+
+            $r = $ppu->hasErrors();
+            if ($r = $r > 0) {
+                $e = $ppu->popError();
+                $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_INVALIDDRIVER,
+                                  'exception', 'abstract method');
             }
         } else {
             $r = $ppu;
