@@ -326,5 +326,49 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
         }
         $this->assertTrue($r);
     }
+
+    /**
+     * Tests to upgrade to a new version
+     *
+     * @return void
+     * @group  stub
+     */
+    public function testDoUpdate()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear');
+
+        if ($ppu !== false) {
+            $r = $ppu->checkUpdate();
+            if ($r) {
+                $r = $ppu->presentUpdate();
+                if ($r) {
+                    $ppu->forceRestart();
+                }
+            }
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests to set all known preferences at-once
+     *
+     * @return void
+     * @group  stub
+     */
+    public function testSetAndSanitizePreferences()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear');
+
+        if ($ppu !== false) {
+            $prefs = array(PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE => true,
+                           PEAR_PACKAGEUPDATE_PREF_STATE => PEAR_PACKAGEUPDATE_STATE_STABLE);
+            $r = $ppu->setPreferences($prefs);
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
 }
 ?>
