@@ -292,5 +292,33 @@ class PEAR_PackageUpdate_TestSuite_Exception extends PHPUnit_Framework_TestCase
         }
         $this->assertTrue($r);
     }
+
+    /**
+     * Tests to catch exception when trying to upgrade to a new version
+     * on a package that is not yet installed
+     *
+     * @return void
+     * @group  exception
+     */
+    public function testDoUpdateWhenPackageNotInstalled()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Services_W3C_CSSValidator', 'pear');
+
+        if ($ppu !== false) {
+            $r = $ppu->checkUpdate();
+            if ($r) {
+                $ppu->update();
+                $r = $ppu->hasErrors();
+                if ($r = $r > 0) {
+                    $e = $ppu->popError();
+                    $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_NOTINSTALLED, 'error');
+                }
+            }
+
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
 }
 ?>
