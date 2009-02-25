@@ -145,6 +145,10 @@ define('PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER', -12);
  * Invalid INI file
  */
 define('PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE', -13);
+/**
+ * Invalid driver structure
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_INVALIDDRIVER', -14);
 
 // Error messages.
 $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
@@ -175,7 +179,10 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
         PEAR_PACKAGEUPDATE_ERROR_NONEXISTENTDRIVER =>
             'Driver %drivername% could not be found.',
         PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE =>
-            'Invalid (%layer%) INI file : %file%'
+            'Invalid (%layer%) INI file : %file%',
+        PEAR_PACKAGEUPDATE_ERROR_INVALIDDRIVER =>
+            '%function% is an abstract method that must be' .
+            ' overridden in the driver class.'
     );
 
 /**
@@ -755,7 +762,8 @@ class PEAR_PackageUpdate
         }
 
         // Pull out the latest information.
-        $this->latestVersion = reset(array_keys($info['releases']));
+        $versions            = array_keys($info['releases']);
+        $this->latestVersion = reset($versions);
 
         $this->info                = reset($info['releases']);
         $this->info['version']     = $this->latestVersion;
@@ -949,29 +957,33 @@ class PEAR_PackageUpdate
         if (!$this->getPackageInfo()) {
             return false;
         }
-        // compatibility for package.xml version 2.0
-        if (isset($this->instInfo['old'])) {
-            $instInfo = $this->instInfo['old'];
-            $instInfo['packagerversion']
-                = $this->instInfo['attribs']['packagerversion'];
+        if (is_null($this->instInfo)) {
+            $info = array('version' => $this->instVersion);
         } else {
-            $instInfo = $this->instInfo;
-            if (!isset($instInfo['packagerversion'])) {
-                $instInfo['packagerversion'] = '';
+            // compatibility for package.xml version 2.0
+            if (isset($this->instInfo['old'])) {
+                $instInfo = $this->instInfo['old'];
+                $instInfo['packagerversion']
+                    = $this->instInfo['attribs']['packagerversion'];
+            } else {
+                $instInfo = $this->instInfo;
+                if (!isset($instInfo['packagerversion'])) {
+                    $instInfo['packagerversion'] = '';
+                }
             }
+            $info = array(
+                'version'         => $this->instVersion,
+                'license'         => $instInfo['release_license'],
+                'summary'         => $this->instInfo['summary'],
+                'description'     => $this->instInfo['description'],
+                'releasedate'     => $instInfo['release_date'],
+                'releasenotes'    => $instInfo['release_notes'],
+                'state'           => $instInfo['release_state'],
+                'deps'            => $instInfo['release_deps'],
+                'xsdversion'      => $this->instInfo['xsdversion'],
+                'packagerversion' => $instInfo['packagerversion'],
+            );
         }
-        $info = array(
-            'version'         => $instInfo['version'],
-            'license'         => $instInfo['release_license'],
-            'summary'         => $this->instInfo['summary'],
-            'description'     => $this->instInfo['description'],
-            'releasedate'     => $instInfo['release_date'],
-            'releasenotes'    => $instInfo['release_notes'],
-            'state'           => $instInfo['release_state'],
-            'deps'            => $instInfo['release_deps'],
-            'xsdversion'      => $this->instInfo['xsdversion'],
-            'packagerversion' => $instInfo['packagerversion'],
-        );
         return $info;
     }
 
@@ -1240,11 +1252,13 @@ class PEAR_PackageUpdate
      * @access public
      * @return void
      * @since  version 0.4.0a1 (2006-03-28)
+     * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDDRIVER
      */
     function forceRestart()
     {
-        $this->pushError('forceRestart is an abstract method that must be' .
-            ' overridden in the child class.');
+        $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDDRIVER,
+                'exception',
+                array('function' => 'forceRestart'));
     }
 
     /**
@@ -1254,11 +1268,13 @@ class PEAR_PackageUpdate
      * @access public
      * @return boolean true if the user wants to update
      * @since  version 0.4.0a1 (2006-03-28)
+     * @throws PEAR_PACKAGEUPDATE_ERROR_INVALIDDRIVER
      */
     function presentUpdate()
     {
-        $this->pushError('presentUpdate is an abstract method that must be' .
-            ' overridden in the child class.');
+        $this->pushError(PEAR_PACKAGEUPDATE_ERROR_INVALIDDRIVER,
+                'exception',
+                array('function' => 'presentUpdate'));
 
         // Return false just in case something odd has happened.
         return false;
