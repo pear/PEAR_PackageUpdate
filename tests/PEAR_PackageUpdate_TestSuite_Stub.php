@@ -103,13 +103,16 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
            Console_Getopt version 1.2.3
          */
         $lastmodified = time();
-        $packages     = array('text_diff', 'console_getopt');
+        $packages     = array('text_diff', 'console_getopt', 'services_w3c_cssvalidator');
 
         foreach ($packages as $p) {
             // all releases for package
             $contents = file_get_contents($restdir . $ds .
                             'rest.cachefile.'.$p.'.allreleases.ser');
             $releases = unserialize($contents);
+            if (!isset($releases['r'][0])) {
+                $releases['r'] = array($releases['r']);
+            }
 
             // prepare cache file (+id) about each :
             foreach ($releases['r'] as $r) {
@@ -218,6 +221,24 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests for checking if an update is available for a package not yet installed
+     *
+     * @return void
+     * @group  stub
+     */
+    public function testCheckUpdateForPackageNotInstalled()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Services_W3C_CSSValidator', 'pear');
+
+        if ($ppu !== false) {
+            $r = $ppu->checkUpdate();
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
      * Tests to install only newer version that follow a major release
      *
      * @return void
@@ -254,11 +275,11 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
      */
     public function testUpdateOnlyStableVersion()
     {
-        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear');
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Services_W3C_CSSValidator', 'pear');
 
         if ($ppu !== false) {
             $ppu->setMinimumState(PEAR_PACKAGEUPDATE_STATE_STABLE);
-            $r = $ppu->checkUpdate();
+            $r = ($ppu->checkUpdate() == false);
         } else {
             $r = $ppu;
         }
