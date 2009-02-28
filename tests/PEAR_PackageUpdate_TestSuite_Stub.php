@@ -17,7 +17,7 @@
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version   CVS: $Id$
  * @link      http://pear.php.net/package/PEAR_PackageUpdate
- * @since     File available since Release 1.1.0
+ * @since     File available since Release 1.1.0a1
  */
 
 require_once 'PHPUnit/Framework/TestCase.php';
@@ -33,7 +33,7 @@ require_once 'PEAR/REST.php';
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version   Release: @package_version@
  * @link      http://pear.php.net/package/PEAR_PackageUpdate
- * @since     Class available since Release 1.1.0
+ * @since     Class available since Release 1.1.0a1
  */
 
 class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
@@ -155,6 +155,30 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
             unlink($this->cfg_file);
         }
         unlink($this->usr_file);
+    }
+
+    /**
+     * tests API throws error
+     *
+     * @param array  $error   PEAR_ErrorStack stack entry
+     * @param int    $code    error code
+     * @param string $level   error level (exception or error)
+     * @param string $message part of error message to check
+     *
+     * @return void
+     */
+    public function catchError($error, $code = null, $level = null, $message = null)
+    {
+        $this->assertType(PHPUnit_Framework_Constraint_IsType::TYPE_ARRAY, $error);
+        if (isset($code)) {
+            $this->assertEquals($error['code'], $code);
+        }
+        if (isset($level)) {
+            $this->assertEquals($error['level'], $level);
+        }
+        if (isset($message)) {
+            $this->assertRegExp('/'.$message.'/', $error['message']);
+        }
     }
 
     /**
@@ -365,6 +389,61 @@ class PEAR_PackageUpdate_TestSuite_Stub extends PHPUnit_Framework_TestCase
             $prefs = array(PEAR_PACKAGEUPDATE_PREF_NEXTRELEASE => true,
                            PEAR_PACKAGEUPDATE_PREF_STATE => PEAR_PACKAGEUPDATE_STATE_STABLE);
             $r = $ppu->setPreferences($prefs);
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests for checking if an update is available for a package installed
+     * using only XMLRPC protocol
+     *
+     * @return void
+     * @group  stub
+     */
+    public function testCheckUpdateWithXMLRPC()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear');
+
+        if ($ppu !== false) {
+            $ppu->addAdapter('XmlRPC', 1);
+            if ($r = ($ppu->hasErrors() == 0)) {
+                $ppu->checkUpdate();
+                if ($r = ($ppu->hasErrors('error') > 0)) {
+                    $e = $ppu->popError();
+                    $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER,
+                                      'error', 'supported protocols');
+                }
+            }
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests for checking if an update is available for a package installed
+     * using a prefered (Soap) and alternative (REST) protocol
+     *
+     * WARNING: as Soap adapter is not provided with version 1.1.0,
+     *          if you have not implemented your own adapter, it will throw
+     *          a warning exception
+     *
+     * @return void
+     * @group  stub
+     */
+    public function testCheckUpdateWithSoapOrREST()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Text_Diff', 'pear');
+
+        if ($ppu !== false) {
+            $ppu->addAdapter('Soap', 2);  // will throws a warning exception
+            $ppu->addAdapter('REST', 1);
+            if ($r = ($ppu->hasErrors() == 0)) {
+                $r = $ppu->checkUpdate();
+                $r = ($ppu->hasErrors('error') == 0 && $r);
+            }
         } else {
             $r = $ppu;
         }
