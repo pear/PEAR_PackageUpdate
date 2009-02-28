@@ -17,7 +17,7 @@
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version   CVS: $Id$
  * @link      http://pear.php.net/package/PEAR_PackageUpdate
- * @since     File available since Release 1.1.0
+ * @since     File available since Release 1.1.0a1
  */
 
 if (!defined('PHPUnit_MAIN_METHOD')) {
@@ -54,7 +54,7 @@ require_once 'PEAR_PackageUpdate_TestSuite_Stub.php';
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version   Release: @package_version@
  * @link      http://pear.php.net/package/PEAR_PackageUpdate
- * @since     Class available since Release 1.1.0
+ * @since     Class available since Release 1.1.0a1
  */
 
 class PEAR_PackageUpdate_AllTests
@@ -64,7 +64,7 @@ class PEAR_PackageUpdate_AllTests
      *
      * @return void
      * @static
-     * @since  1.1.0
+     * @since  1.1.0a1
      */
     public static function main()
     {
@@ -76,7 +76,7 @@ class PEAR_PackageUpdate_AllTests
      *
      * @return object the PHPUnit_Framework_TestSuite object
      * @static
-     * @since  1.1.0
+     * @since  1.1.0a1
      */
     public static function suite()
     {
