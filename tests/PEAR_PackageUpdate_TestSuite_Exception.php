@@ -17,7 +17,7 @@
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version   CVS: $Id$
  * @link     http://pear.php.net/package/PEAR_PackageUpdate
- * @since    File available since Release 1.1.0
+ * @since    File available since Release 1.1.0a1
  */
 
 require_once "PHPUnit/Framework/TestCase.php";
@@ -36,7 +36,7 @@ require_once 'PEAR/PackageUpdate.php';
  * @license   http://www.php.net/license/3_01.txt  PHP License 3.01
  * @version  Release: @package_version@
  * @link     http://pear.php.net/package/PEAR_PackageUpdate
- * @since    Class available since Release 1.1.0
+ * @since    Class available since Release 1.1.0a1
  */
 class PEAR_PackageUpdate_TestSuite_Exception extends PHPUnit_Framework_TestCase
 {
@@ -315,6 +315,79 @@ class PEAR_PackageUpdate_TestSuite_Exception extends PHPUnit_Framework_TestCase
                 }
             }
 
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests to catch exception on invalid type of parameter #1 (adapter name)
+     *
+     * @return void
+     * @group  exception
+     */
+    public function testAddInvalidAdapterName()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Services_W3C_CSSValidator', 'pear');
+
+        if ($ppu !== false) {
+            $ppu->addAdapter(array('REST', '1.0'), 99);
+            $r = $ppu->hasErrors();
+            if ($r = $r > 0) {
+                $e = $ppu->popError();
+                $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER,
+                                  'exception', 'parameter #1 is not string');
+            }
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests to catch exception on invalid type of parameter #2 (adapter priority)
+     *
+     * @return void
+     * @group  exception
+     */
+    public function testAddInvalidAdapterPriority()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Services_W3C_CSSValidator', 'pear');
+
+        if ($ppu !== false) {
+            $ppu->addAdapter('REST', '100');
+            $r = $ppu->hasErrors();
+            if ($r = $r > 0) {
+                $e = $ppu->popError();
+                $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER,
+                                  'exception', 'parameter #2 is not integer');
+            }
+        } else {
+            $r = $ppu;
+        }
+        $this->assertTrue($r);
+    }
+
+    /**
+     * Tests to catch exception on adapter not supported by current API
+     *
+     * @return void
+     * @group  exception
+     */
+    public function testAddAdapterNotSupported()
+    {
+        $ppu =& PEAR_PackageUpdate::factory('Cli', 'Services_W3C_CSSValidator', 'pear');
+
+        if ($ppu !== false) {
+            $adapter = 'SoapOpera';
+            $ppu->addAdapter($adapter, 1);
+            $r = $ppu->hasErrors();
+            if ($r = $r > 0) {
+                $e = $ppu->popError();
+                $this->catchError($e, PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER,
+                                  'error', $adapter);
+            }
         } else {
             $r = $ppu;
         }
