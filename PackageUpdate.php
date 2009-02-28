@@ -149,6 +149,10 @@ define('PEAR_PACKAGEUPDATE_ERROR_INVALIDINIFILE', -13);
  * Invalid driver structure
  */
 define('PEAR_PACKAGEUPDATE_ERROR_INVALIDDRIVER', -14);
+/**
+ * Wrong adapter
+ */
+define('PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER', -15);
 
 // Error messages.
 $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
@@ -182,7 +186,9 @@ $GLOBALS['_PEAR_PACKAGEUPDATE_ERRORS'] =
             'Invalid (%layer%) INI file : %file%',
         PEAR_PACKAGEUPDATE_ERROR_INVALIDDRIVER =>
             '%function% is an abstract method that must be' .
-            ' overridden in the driver class.'
+            ' overridden in the driver class.',
+        PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER =>
+            '%adapter% adapter is not supported'
     );
 
 /**
@@ -366,6 +372,15 @@ class PEAR_PackageUpdate
     var $errors;
 
     /**
+     * List of adapters used to communicate with package channels
+     *
+     * @access public
+     * @var    array
+     * @since  1.1.0a1
+     */
+    var $adapters = array();
+
+    /**
      * PHP 4 style constructor. Calls the PHP 5 style constructor.
      *
      * @param string $packageName The package to update.
@@ -485,7 +500,7 @@ class PEAR_PackageUpdate
         if (!class_exists($class)) {
 
             // Try to include the driver.
-            $file = 'PEAR/PackageUpdate/' . $driver . '.php';
+            $file = str_replace('_', '/', $class) . '.php';
 
             if (!PEAR_PackageUpdate::isIncludable($file)) {
                 PEAR_ErrorStack::staticPush('PEAR_PackageUpdate',
@@ -680,6 +695,7 @@ class PEAR_PackageUpdate
      * @throws PEAR_PACKAGEUPDATE_ERROR_NOPACKAGE,
      *         PEAR_PACKAGEUPDATE_ERROR_NOCHANNEL,
      *         PEAR_PACKAGEUPDATE_ERROR_NOINFO
+     *         PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER
      */
     function getPackageInfo()
     {
@@ -699,78 +715,62 @@ class PEAR_PackageUpdate
             return false;
         }
 
+        // If there are no adapters defined, used in following order (priority level)
+        // - the REST protocol by default,
+        // - then if not supported by channel, try the XMLRPC protocol
+        if (count($this->adapters) == 0) {
+            $this->addAdapter('REST', 2);
+            $this->addAdapter('XmlRPC', 1);
+        }
+        arsort($this->adapters, SORT_NUMERIC);
+
         // Create a config object.
         $config =& PEAR_Config::singleton($this->user_file, $this->system_file);
 
-        if (empty($this->user_file)) {
-            if (empty($this->system_file)) {
-                $layer = null;
-            } else {
-                $layer = 'system';
+        foreach ($this->adapters as $adapter => $priority) {
+            $class = 'PEAR_PackageUpdate_Adapter_' . $adapter;
+            // Attempt to include a custom version of the named class, but don't treat
+            // a failure as fatal.  The caller may have already included their own
+            // version of the named class.
+            if (!class_exists($class)) {
+                // Try to include the driver.
+                $file = str_replace('_', '/', $class) . '.php';
+                if (PEAR_PackageUpdate::isIncludable($file)) {
+                    include_once $file;
+                }
             }
-        } else {
-            $layer = 'user';
-        }
-        // Get the config's registry object.
-        $reg = $config->getRegistry($layer);
+            if (!class_exists($class)) {
+                $this->pushError(PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER,
+                    'warning', array(), $adapter .' adapter is missing');
+                continue;
+            }
+            $adapter = new $class($config, $this);
+            if ($adapter->supports()) {
+                $info = $adapter->sendRequest('package.info');
+                // Check to make sure the package was found.
+                if (PEAR::isError($info) || !isset($info['name'])) {
+                    $this->pushError(PEAR_PACKAGEUPDATE_ERROR_NOINFO, 'error',
+                        array('packagename' => $this->packageName));
+                    break;
+                }
 
-        // Parse the package name.
-        $parsed = $reg->parsePackageName($this->channel . '/' . $this->packageName);
+                // Pull out the latest information.
+                $versions            = array_keys($info['releases']);
+                $this->latestVersion = reset($versions);
 
-        // Check for errors.
-        if (PEAR::isError($parsed)) {
-            $this->pushError($parsed);
-            return false;
-        }
+                $this->info                = reset($info['releases']);
+                $this->info['version']     = $this->latestVersion;
+                $this->info['summary']     = $info['summary'];
+                $this->info['description'] = $info['description'];
 
-        // Get a channel object.
-        $chan   =& $reg->getChannel($this->channel);
-        $mirror = $config->get('preferred_mirror');
-        if ($chan->supportsREST($mirror)
-            && $base = $chan->getBaseURL('REST1.0', $mirror)) {
-
-            $rest =& $config->getREST('1.0', array());
-            $info =  $rest->packageInfo($base, $parsed['package']);
-        } else {
-            $r    =& $config->getRemote();
-            $info =  $r->call('package.info', $parsed['package']);
-        }
-
-        // Check to make sure the package was found.
-        if (PEAR::isError($info) || !isset($info['name'])) {
-            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_NOINFO, 'error',
-                array('packagename' => $this->packageName));
-            return false;
-        }
-
-        // Get full installed data of the package.
-        $this->instInfo = $reg->packageInfo($parsed['package'], null,
-                              $parsed['channel']);
-        if (is_null($this->instInfo)) {
-            $this->instVersion = '';
-        } else {
-            if ($this->instInfo['xsdversion'] == '1.0') {
-                $this->instVersion = $this->instInfo['version'];
-            } else {
-                $this->instVersion = $this->instInfo['version']['release'];
+                return true;
             }
         }
 
-        // If the package is not installed, create a dummy version.
-        if (empty($this->instVersion)) {
-            $this->instVersion = '0.0.0';
-        }
-
-        // Pull out the latest information.
-        $versions            = array_keys($info['releases']);
-        $this->latestVersion = reset($versions);
-
-        $this->info                = reset($info['releases']);
-        $this->info['version']     = $this->latestVersion;
-        $this->info['summary']     = $info['summary'];
-        $this->info['description'] = $info['description'];
-
-        return true;
+        $this->pushError(PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER,
+            'error', array(), 'No '.
+            implode(',', array_keys($this->adapters)) . ' supported protocols');
+        return false;
     }
 
     /**
@@ -957,6 +957,28 @@ class PEAR_PackageUpdate
         if (!$this->getPackageInfo()) {
             return false;
         }
+
+        $config =& PEAR_Config::singleton($this->user_file, $this->system_file);
+        $reg    =&$config->getRegistry();
+
+        // Get full installed data of the package.
+        $this->instInfo = $reg->packageInfo($this->packageName, null,
+                                            $this->channel);
+        if (is_null($this->instInfo)) {
+            $this->instVersion = '';
+        } else {
+            if ($this->instInfo['xsdversion'] == '1.0') {
+                $this->instVersion = $this->instInfo['version'];
+            } else {
+                $this->instVersion = $this->instInfo['version']['release'];
+            }
+        }
+
+        // If the package is not installed, create a dummy version.
+        if (empty($this->instVersion)) {
+            $this->instVersion = '0.0.0';
+        }
+
         if (is_null($this->instInfo)) {
             $info = array('version' => $this->instVersion);
         } else {
@@ -1401,6 +1423,47 @@ class PEAR_PackageUpdate
     function hasErrors($level = false)
     {
         return $this->errors->hasErrors($level);
+    }
+
+    /**
+     * Add an interface adapter
+     *
+     * Add an interface adapter to communicate with remote server.
+     * API 1.0.x did not support adapters yet
+     * API 1.1.0 support only 3 adapters (REST, XmlRPC and Soap)
+     * IMPORTANT: Soap adapter is not provided
+     *
+     * @param string $adapter  Name of the adapter to use for remote access
+     * @param int    $priority Priority level of usage to this adapter
+     *                         (the hightest level is used first)
+     *
+     * @access public
+     * @return bool
+     * @since  version 1.1.0a1 (2009-02-28)
+     * @throws PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER
+     */
+    function addAdapter($adapter, $priority)
+    {
+        if (!is_string($adapter)) {
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER,
+                'exception', array(), 'adapter parameter #1 is not string');
+            return false;
+        }
+        if (!is_int($priority)) {
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER,
+                'exception', array(), 'priority parameter #2 is not integer');
+            return false;
+        }
+
+        $adapters = array('REST' => 20, 'XmlRPC' => 10, 'Soap' => 1);
+        $add      = array_key_exists($adapter, $adapters);
+
+        if ($add) {
+            $this->adapters[$adapter] = $priority;
+        } else {
+            $this->pushError(PEAR_PACKAGEUPDATE_ERROR_WRONGADAPTER,
+                'error', array('adapter' => $adapter));
+        }
     }
 }
 ?>
