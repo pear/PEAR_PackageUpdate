@@ -26,12 +26,12 @@ if (!defined('PHPUnit_MAIN_METHOD')) {
 
 require_once 'PHPUnit/Framework.php';
 require_once 'PHPUnit/TextUI/TestRunner.php';
+require_once 'PHPUnit/Extensions/PhptTestSuite.php';
 
 error_reporting(E_ALL & ~E_STRICT);
 chdir(dirname(__FILE__));
 
 require_once 'PEAR_PackageUpdate_TestSuite_Exception.php';
-require_once 'PEAR_PackageUpdate_TestSuite_Standard.php';
 require_once 'PEAR_PackageUpdate_TestSuite_Stub.php';
 
 /**
@@ -81,8 +81,9 @@ class PEAR_PackageUpdate_AllTests
     public static function suite()
     {
         $dir   = dirname(__FILE__);
+        $phpt  = new PHPUnit_Extensions_PhptTestSuite($dir);
         $suite = new PHPUnit_Framework_TestSuite('PEAR_PackageUpdate Test Suite');
-        $suite->addTestSuite(new PEAR_PackageUpdate_TestSuite_Standard($dir));
+        $suite->addTestSuite($phpt);
         $suite->addTestSuite('PEAR_PackageUpdate_TestSuite_Exception');
         $suite->addTestSuite('PEAR_PackageUpdate_TestSuite_Stub');
         return $suite;
