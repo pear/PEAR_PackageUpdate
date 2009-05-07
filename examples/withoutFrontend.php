@@ -8,7 +8,7 @@
  * @category PEAR
  * @package  PEAR_PackageUpdate
  * @author   Laurent Laville <pear@laurent-laville.org>
- * @license  http://www.php.net/license/3_01.txt  PHP License 3.01
+ * @license  http://www.opensource.org/licenses/bsd-license.php BSD
  * @version  CVS: $Id$
  * @link     http://pear.php.net/package/PEAR_PackageUpdate
  * @since    File available since Release 0.5.0
