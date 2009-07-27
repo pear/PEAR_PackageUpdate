@@ -8,7 +8,6 @@ $sysconfdir = $dir . $ds . 'sysconf_dir';
 $peardir    = $dir . $ds . 'pear_dir';
 
 putenv("PHP_PEAR_SYSCONF_DIR=" . $sysconfdir);
-chdir($dir);
 
 // we get PEAR_PackageUpdate class only here due to setting of PEAR_CONFIG_SYSCONFDIR
 include_once 'PEAR/PackageUpdate.php';
