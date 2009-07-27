@@ -13,6 +13,7 @@
  * @since    File available since Release 0.6.0
  */
 
+require_once 'PEAR/PackageUpdate.php';
 
 /**
  * This is the default CLI driver for PEAR_PackageUpdate.

@@ -22,9 +22,6 @@ require_once 'PHPUnit/Framework.php';
 require_once 'PHPUnit/TextUI/TestRunner.php';
 require_once 'PHPUnit/Extensions/PhptTestSuite.php';
 
-error_reporting(E_ALL & ~E_STRICT);
-chdir(dirname(__FILE__));
-
 require_once 'PEAR_PackageUpdate_TestSuite_Exception.php';
 require_once 'PEAR_PackageUpdate_TestSuite_Stub.php';
 
