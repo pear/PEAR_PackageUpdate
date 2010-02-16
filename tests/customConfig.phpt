@@ -183,9 +183,15 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 }
 $bad_pref_file = $pearcfgdir . $ds . 'corrupted_' . basename($pref_file);
 
-unlink ($system_file);
-unlink ($pref_file);
-unlink ($bad_pref_file);
+if (file_exists($system_file)) {
+    unlink ($system_file);
+}
+if (file_exists($pref_file)) {
+    unlink ($pref_file);
+}
+if (file_exists($bad_pref_file)) {
+    unlink ($bad_pref_file);
+}
 ?>
 --EXPECT--
 testWrongDriver initClass : KO

@@ -85,8 +85,12 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
     $pref_file   = $pearcfgdir . $ds . '.ppurc';
 }
 
-unlink ($system_file);
-unlink ($pref_file);
+if (file_exists($system_file)) {
+    unlink ($system_file);
+}
+if (file_exists($pref_file)) {
+    unlink ($pref_file);
+}
 ?>
 --EXPECT--
 testConfigFilesExistInSysConfDir initClass : OK
