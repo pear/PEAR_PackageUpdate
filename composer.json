@@ -1,0 +1,36 @@
+{
+    "authors": [
+        {
+            "email": "pear@laurent-laville.org",
+            "name": "Laurent Laville",
+            "role": "Lead"
+        },
+        {
+            "email": "scottmattocks@php.net",
+            "name": "Scott Mattocks",
+            "role": "Lead"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "PEAR_PackageUpdate": "./"
+        }
+    },
+    "description": "More info available on: http://pear.php.net/package/PEAR_PackageUpdate",
+    "include-path": [
+        "./"
+    ],
+    "license": "PHP License 3.01",
+    "name": "pear/pear_packageupdate",
+    "support": {
+        "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=PEAR_PackageUpdate",
+        "source": "https://github.com/pear/PEAR_PackageUpdate"
+    },
+    "type": "library",
+    "require": {
+        "pear/pear_exception": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+}
